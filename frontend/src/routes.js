@@ -76,14 +76,14 @@ export function Routex() {
                         )
                         : (
                             <Routes>
-                                <Route exact path="/" component={About} />
+                                <Route exact path="/" element={(<About />)} />
                                 <Route path="/loginPage" element={
                                     isLoggedIn ? (<Navigate to="/" />) : (<Login login={login} />)
                                 }/>
                                 <Route exact path="/registerPage" element={
                                     isLoggedIn ? (<Navigate to="/" />) : (<Register />)
                                 }/>
-                                <Route exact path="/about" component={About} />
+                                <Route exact path="/about" element={<About />} />
                             </Routes>
                         )
                 }

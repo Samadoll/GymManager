@@ -9,11 +9,11 @@ export function About(props) {
                 fontFamily: "Verdana",
                 lineHeight: 5
             }}>
-                <label>This is an About page. (under construction)</label>
+                <label>This is an About page.</label>
                 <br/>
                 <label>Created with Spring Boot and React</label>
                 <br/>
-                <label>Create by JW Studio</label>
+                <label>Create by Jiawei</label>
             </div>
         </div>
     )
