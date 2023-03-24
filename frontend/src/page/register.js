@@ -1,12 +1,14 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import Axios from "axios"
-import { toaster } from "evergreen-ui";
+import {toaster} from "evergreen-ui";
 
 export function Register() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirm, setConfirm] = useState("")
+    const [role, setRole] = React.useState("")
+    const options = [{ label: 'Coach', value: 'COACH' }, { label: 'Trainee', value: 'TRAINEE' }]
     const navigate = useNavigate();
 
     function handleRegister() {
@@ -19,19 +21,26 @@ export function Register() {
             toaster.danger("Password Not Match");
             return;
         }
+        if (role === "" || role === undefined) {
+            toaster.danger("Member Role Not Select");
+            return;
+        }
         const query = new FormData();
         query.append("username", username);
         query.append("password", password);
-        Axios.post("/api/register", query)
+        query.append("role", role);
+        Axios.post("/api/v1/auth/register", query, {
+            headers: {
+                'Content-Type': 'application/json',
+            }})
             .then(res => {
                 const data = res.data;
-                const status = data.status;
-                if (status === 200) {
+                if (res.status === 200) {
                     navigate("/loginPage")
-                    toaster.success(data.message);
                 }
             })
             .catch(error => {
+                // TODO
                 toaster.danger(error.response.data.message);
             })
     }
@@ -80,6 +89,14 @@ export function Register() {
                         onChange={e => setConfirm(e.target.value)}
                     />
                 </form>
+                <br/>
+                <div className="login-register-selection">
+                    {options.map(({ label, value }) => (
+                        <button key={label} className={"login-register-selection-button" + (role === value ? "-active" : "")} onClick={() => setRole(value)}>
+                            {label}
+                        </button>
+                    ))}
+                </div>
                 <br/>
                 <button
                     onClick={() => {handleRegister();}}
