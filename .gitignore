@@ -31,3 +31,25 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### react part ###
+frontend/node_modules
+frontend/README.md
+
+package-lock.json
+yarn.lock
+node_modules
+frontend/.pnp
+frontend/.pnp.js
+frontend/build
+frontend/.DS_Store
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+src/main/resources/static/built/
+
+.DS_Store
