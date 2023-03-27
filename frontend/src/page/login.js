@@ -12,13 +12,16 @@ export function Login(props) {
         const query = new FormData();
         query.append("username", username);
         query.append("password", password);
-        Axios.post("/login", query)
+        Axios.post("/api/v1/auth/authenticate", query, {
+            headers: {
+                'Content-Type': 'application/json',
+            }})
             .then(res => {
+                console.log(res)
                 const data = res.data;
-                const status = data.status;
-                if (status === 200) {
-                    const token = data.data.token;
-                    const uid = data.data.uid;
+                if (res.status === 200) {
+                    const token = data.token;
+                    const uid = data.uid;
                     localStorage.setItem("Authorization", token);
                     Axios.defaults.headers.Authorization = token;
                     props.login({ username: username, uid: uid });
@@ -35,7 +38,7 @@ export function Login(props) {
         <div className="login-register-page">
             <div className="login-register-content">
                 <div style={{textAlign: "center", fontFamily: "Verdana", fontSize: "30px"}}>
-                    <label>Sign in to Blog</label>
+                    <label>Sign in to Gym Manager</label>
                 </div>
                 <hr/>
                 <br/>

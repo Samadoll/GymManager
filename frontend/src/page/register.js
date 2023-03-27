@@ -34,14 +34,13 @@ export function Register() {
                 'Content-Type': 'application/json',
             }})
             .then(res => {
-                const data = res.data;
                 if (res.status === 200) {
+                    toaster.success("Successfully Registered")
                     navigate("/loginPage")
                 }
             })
             .catch(error => {
-                // TODO
-                toaster.danger(error.response.data.message);
+                toaster.danger("User Already Existed");
             })
     }
 

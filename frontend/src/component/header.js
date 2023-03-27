@@ -9,7 +9,7 @@ function HeaderButtonGroup(props) {
 
     function handleLogOut() {
         Axios.defaults.headers.Authorization = localStorage.getItem("Authorization");
-        Axios.post("/api/user/logout");
+        // Axios.post("/api/v1/auth/logout"); TODO: used to evict authorization
         props.logout();
         navigate("/")
     }
@@ -21,11 +21,11 @@ function HeaderButtonGroup(props) {
                     position={Position.BOTTOM_LEFT}
                     content={
                         <Menu>
-                            <Menu.Group>
-                                <Menu.Item icon="person" onSelect={() => navigate("/myAccount")}>My Account</Menu.Item>
-                                <Menu.Item icon="book" onSelect={() => navigate("/manageContents")}>Manage My Contents</Menu.Item>
-                            </Menu.Group>
-                            <Menu.Divider />
+                            {/*<Menu.Group>*/}
+                            {/*    <Menu.Item icon="person" onSelect={() => navigate("/myAccount")}>My Account</Menu.Item>*/}
+                            {/*    <Menu.Item icon="book" onSelect={() => navigate("/manageContents")}>Manage My Contents</Menu.Item>*/}
+                            {/*</Menu.Group>*/}
+                            {/*<Menu.Divider />*/}
                             <Menu.Group>
                                 <Menu.Item
                                     icon="key"
@@ -69,7 +69,7 @@ function HeaderButtonGroup(props) {
 export function Header(props) {
     const pages = [
         {name: "Home", href: "#/", loginRequired: false},
-        {name: "My Contents", href: "#/myContents", loginRequired: true},
+        {name: "My Appointments", href: "#/myAppointments", loginRequired: true},
         {name: "About", href: "#/about", loginRequired: false}
     ];
     return (

@@ -34,13 +34,13 @@ export function Routex() {
         const token = localStorage.getItem("Authorization") || "";
         if (token !== "") {
             try {
-                Axios.defaults.headers.Authorization = localStorage.getItem("Authorization") || "";
-                const res = await Axios.get("/api/user/checkAuth");
+                Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
+                const res = await Axios.get("/api/v1/auth/checkAuth");
                 const status = res.status;
                 if (status === 200) {
                     setUserInfo({
-                        username: res.data.data.username,
-                        uid: res.data.data.uid
+                        username: res.data.username,
+                        uid: res.data.uid
                     });
                     setIsLoggedIn(true);
                 } else {
