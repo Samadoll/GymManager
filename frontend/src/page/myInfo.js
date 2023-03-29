@@ -14,7 +14,6 @@ export function MyInfo(props) {
             Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
             const res = await Axios.get("/api/v1/user/getInfo");
             const status = res.data.status;
-            console.log(res)
             if (status === 200) {
                 const data = res.data.data;
                 setInfo(data);
