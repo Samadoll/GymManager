@@ -17,7 +17,6 @@ export function Login(props) {
                 'Content-Type': 'application/json',
             }})
             .then(res => {
-                console.log(res)
                 const data = res.data;
                 if (res.status === 200) {
                     const token = data.token;

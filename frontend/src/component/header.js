@@ -9,7 +9,7 @@ function HeaderButtonGroup(props) {
 
     function handleLogOut() {
         Axios.defaults.headers.Authorization = localStorage.getItem("Authorization");
-        // Axios.post("/api/v1/auth/logout"); TODO: used to evict authorization
+        // Axios.post("/api/v1/auth/logout"); TODO: used to evict authorization token
         props.logout();
         navigate("/")
     }
@@ -23,7 +23,6 @@ function HeaderButtonGroup(props) {
                         <Menu>
                             {/*<Menu.Group>*/}
                             {/*    <Menu.Item icon="person" onSelect={() => navigate("/myAccount")}>My Account</Menu.Item>*/}
-                            {/*    <Menu.Item icon="book" onSelect={() => navigate("/manageContents")}>Manage My Contents</Menu.Item>*/}
                             {/*</Menu.Group>*/}
                             {/*<Menu.Divider />*/}
                             <Menu.Group>

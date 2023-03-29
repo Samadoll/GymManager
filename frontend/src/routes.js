@@ -6,6 +6,7 @@ import { Header } from "./component/header";
 import Axios from "axios";
 import { Spinner } from "evergreen-ui";
 import { About } from "./page/about";
+import { MyInfo } from "./page/myInfo";
 
 export function Routex() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -76,7 +77,9 @@ export function Routex() {
                         )
                         : (
                             <Routes>
-                                <Route exact path="/" element={(<About />)} />
+                                <Route exact path="/" element={
+                                    isLoggedIn ? (<MyInfo isLoggedIn={isLoggedIn} userInfo={userInfo} logout={logout} />) : (<About />)
+                                }/>
                                 <Route path="/loginPage" element={
                                     isLoggedIn ? (<Navigate to="/" />) : (<Login login={login} />)
                                 }/>

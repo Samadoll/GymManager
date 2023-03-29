@@ -41,8 +41,6 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse checkAuth(){
-        var x = SecurityContextHolder.getContext();
-        var y = SecurityContextHolder.getContext().getAuthentication();
         var principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return AuthenticationResponse.builder().uid(principal.getId()).username(principal.getUsername()).build();
     }
