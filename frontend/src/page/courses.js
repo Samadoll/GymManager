@@ -4,17 +4,16 @@ import {Avatar, toaster} from "evergreen-ui";
 
 export function MyCourses(props) {
 
-    const [events, setEvents] = useState([])
+    const [Courses, setCourses] = useState([])
 
-    async function fetchUserEvents() {
+    async function fetchCourses() {
         try {
             Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
             const res = await Axios.get("/api/v1/course/getCourses");
-            console.log(res);
             const status = res.data.status;
             if (status === 200) {
                 const data = res.data.data;
-                setEvents(data);
+                setCourses(data);
             }
         } catch (err) {
             toaster.danger(err.response.data.message);
@@ -22,7 +21,7 @@ export function MyCourses(props) {
     }
 
     useEffect(() => {
-        fetchUserEvents();
+        fetchCourses();
     },[])
 
     return (
