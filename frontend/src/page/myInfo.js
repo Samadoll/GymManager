@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import Axios from "axios";
-import {Avatar, toaster} from "evergreen-ui";
+import {Avatar} from "evergreen-ui";
+import JNotification from "../component/jNotification";
 
 export function MyInfo(props) {
     const [info, setInfo] = useState({});
@@ -19,7 +20,7 @@ export function MyInfo(props) {
                 setInfo(data);
             }
         } catch (err) {
-            toaster.danger(err.response.data.message);
+            JNotification.danger(err.response.data.message);
             // history.goBack();
         }
     }
@@ -31,11 +32,11 @@ export function MyInfo(props) {
     // TODO: Disabled temporarily
     function handleChangePassword() {
         if (oldPassword === "" || newPassword === "" || confirmPassword === "") {
-            toaster.danger("Please enter valid password.");
+            JNotification.danger("Please enter valid password.");
             return;
         }
         if (newPassword !== confirmPassword) {
-            toaster.danger("Password Not Match");
+            JNotification.danger("Password Not Match");
             return;
         }
 
@@ -57,17 +58,17 @@ export function MyInfo(props) {
                             const data = res.data;
                             const status = data.status;
                             if (status === 200) {
-                                toaster.success("Password is changed. Please login.");
+                                JNotification.success("Password is changed. Please login.");
                                 props.logout();
                             }
                         })
                         .catch((err) => {
-                            toaster.danger(err.response.data.message);
+                            JNotification.danger(err.response.data.message);
                         })
                 }
             })
             .catch(error => {
-                toaster.danger(error.response.data.message);
+                JNotification.danger(error.response.data.message);
             })
     }
 

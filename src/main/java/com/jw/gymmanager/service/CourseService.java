@@ -46,7 +46,7 @@ public class CourseService {
         return JResponse.builder().status(200).data(courses.orElseGet(ArrayList::new)).build();
     }
 
-    public JResponse createCourse(int currentUid, CourseEvent courseEvent) {
+    public JResponse createEditCourse(int currentUid, CourseEvent courseEvent) {
         var user = userRepository.findById(currentUid);
         if (user.isEmpty())
             return JResponse.builder().status(400).message("User Not Exist").build();

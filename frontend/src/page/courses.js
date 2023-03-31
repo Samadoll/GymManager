@@ -1,7 +1,8 @@
 import React, {useEffect, useRef, useState} from "react";
 import Axios from "axios";
-import {Avatar, toaster} from "evergreen-ui";
 import Scheduler from "@aldabil/react-scheduler";
+import JNotification from "../component/jNotification";
+import { Button } from "@mui/material";
 
 export function MyCourses(props) {
     const cal = useRef(null)
@@ -20,7 +21,7 @@ export function MyCourses(props) {
                 buildData(data)
             }
         } catch (err) {
-            toaster.danger(err.response.data.message);
+            JNotification.danger(err.response.data.message);
         }
     }
 
@@ -38,7 +39,7 @@ export function MyCourses(props) {
                 setCoaches(result)
             }
         } catch (err) {
-            toaster.danger(err.response.data.message);
+            JNotification.danger(err.response.data.message);
         }
     }
 
@@ -46,26 +47,40 @@ export function MyCourses(props) {
         fetchData();
         if (props.userInfo.role === "TRAINEE") {
             fetchCoaches();
+            cal.current.scheduler.week.cellRenderer = ({ height, start, onClick, ...props }) => (<Button disableRipple={true}></Button>);
+        } else {
+            delete cal.current.scheduler.week.cellRenderer;
         }
     },[])
 
 
     function buildData(data) {
-        buildCourses(data)
-        buildFields()
+        buildCourses(data);
+        buildFields();
     }
 
     function buildCourses(data) {
+        let result = getCoursesFromData(data);
+        cal.current.scheduler.handleState(result, "events");
+        setCourses(result);
+    }
+
+    function getCoursesFromData(data) {
+        let isReadOnly = props.userInfo.role === "TRAINEE"
         let result = data.map(x => { return {
             event_id: x.id,
             title: x.title,
             description: x.description,
             start: new Date(x.startTime),
             end: new Date(x.endTime),
-            status: x.status
-        }})
-        cal.current.scheduler.handleState(result, "events")
-        setCourses(result)
+            status: x.status,
+            availableSlots: x.availableSlots,
+            registeredSlots: x.registeredSlots,
+            draggable: !isReadOnly,
+            deletable: !isReadOnly,
+            editable: !isReadOnly
+        }});
+        return result;
     }
 
     function buildFields() {
@@ -81,7 +96,7 @@ export function MyCourses(props) {
                 config: { label: "Status" }
             },
             {
-                name: "slots",
+                name: "availableSlots",
                 type: "input",
                 default: 10,
                 config: { label: "Available Slot" }
@@ -102,28 +117,32 @@ export function MyCourses(props) {
         const query = new FormData();
         query.append("startTime", e.start.getTime());
         query.append("endTime", e.end.getTime());
-        query.append("availableSlots", e.slots)
+        query.append("availableSlots", e.availableSlots)
+        query.append("registeredSlots", e.registeredSlots || 0)
         query.append("title", e.title);
         query.append("description", e.description)
         query.append("status", e.status)
-        if (action === "create") {
-            await Axios.post("/api/v1/course/createCourse", query, {
-                headers: {
-                    'Content-Type': 'application/json',
-                }})
-                .then(res => {
-                    if (res.status === 200) {
-                        toaster.success("Successfully Created")
-                        e.event_id = res.data.data
-                    }
-                })
-                .catch(error => {
-                    toaster.danger("Failed to Create Course");
-                })
-            return e;
-        } else {
-
+        let url = action === "create" ? "/api/v1/course/createCourse" : "/api/v1/course/editCourse"
+        let method = action === "create" ? "post" : "put"
+        if (action === "edit") {
+            query.append("id", e.event_id)
         }
+        await Axios({
+            method: method,
+            url: url,
+            data: query,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => {
+            if (res.status === 200) {
+                JNotification.success("Successfully " + action)
+                e.event_id = res.data.data
+            }
+        }).catch(error => {
+            JNotification.danger("Failed to " + action);
+        })
+        return e;
     }
 
     async function getCoachCourse(id) {
@@ -135,19 +154,12 @@ export function MyCourses(props) {
         await Axios.get("/api/v1/course/getCourse/" + id)
             .then(res => {
                 if (res.status === 200) {
-                    let result = res.data.data.map(x => { return {
-                        event_id: x.id,
-                        title: x.title,
-                        description: x.description,
-                        start: new Date(x.startTime),
-                        end: new Date(x.endTime),
-                        status: x.status
-                    }})
+                    let result = getCoursesFromData(res.data.data)
                     cal.current.scheduler.handleState(courses.concat(result), "events");
                 }
             })
             .catch(error => {
-                toaster.danger("Failed to Load Course");
+                JNotification.danger("Failed to Load Course");
             })
     }
 
@@ -184,6 +196,7 @@ export function MyCourses(props) {
                 // fields={fields}
                 // events={courses}
                 onConfirm={(e, action) => handleConfirm(e, action)}
+                onEventDrop={(d, u, o) => handleConfirm(u, "edit")}
             />
         </div>
     )

@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import Axios from "axios"
-import { toaster } from "evergreen-ui";
+import JNotification from "../component/jNotification";
 
 export function Login(props) {
     const [username, setUsername] = useState("");
@@ -25,11 +25,11 @@ export function Login(props) {
                     Axios.defaults.headers.Authorization = token;
                     props.login({ username: username, uid: uid, role: data.role });
                     navigate("/")
-                    toaster.success(`Welcome, ${username}!`);
+                    JNotification.success(`Welcome, ${username}!`);
                 }
             })
             .catch(error => {
-                toaster.danger(error.response.data.message);
+                JNotification.danger(error.response.data.message);
             })
     }
 
