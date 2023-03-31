@@ -23,7 +23,7 @@ public class CourseEvent {
     private Integer registeredSlots;
     private String title;
     @Column(columnDefinition="TEXT")
-    private String Description;
+    private String description;
     @Enumerated(EnumType.STRING)
     private CourseStatus status;
     @Enumerated(EnumType.STRING)

@@ -40,4 +40,14 @@ public class CourseService {
         }
         return JResponse.builder().status(200).data(courses.isPresent() ? courses.get() : new ArrayList<>()).build();
     }
+
+    public JResponse createCourse(int currentUid, CourseEvent courseEvent) {
+        var user = userRepository.findById(currentUid);
+        if (user.isEmpty())
+            return JResponse.builder().status(400).message("User Not Exist").build();
+        var existedUser = user.get();
+        courseEvent.setOwner(existedUser);
+        courseRepository.save(courseEvent);
+        return JResponse.builder().status(200).data(courseEvent.getId()).build();
+    }
 }
