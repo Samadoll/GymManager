@@ -4,6 +4,62 @@ import Scheduler from "@aldabil/react-scheduler";
 import JNotification from "../component/jNotification";
 import { Button } from "@mui/material";
 
+function EventPopup(f, event) {
+
+    const fields = {
+        "Coach": { value: event.coach, renderType: "span", svg: "../person.svg"},
+        "Status": { value: event.status, renderType: "span", svg: "../status.svg"},
+        "Slots": { value: (event.registeredSlots || 0) + " / " + event.availableSlots, renderType: "span", svg: "../group.svg"},
+        "Description": { value: event.description, renderType: "text", svg: "../text.svg"}
+    }
+
+    return (
+        <div>
+            {
+                Object.keys(fields).map((field, index) => (
+                    <div style={{minHeight: "24px"}}>
+                        {
+                            fields[field].renderType === "span"
+                                ? (
+                                    <CustomSpan key={index} >
+                                        <img src={fields[field].svg}
+                                             width={"20px"}
+                                             height={"20px"}
+                                             style={{ verticalAlign: "middle", marginLeft: "2px", marginRight: "10px"}}/>
+                                        {fields[field].value}
+                                    </CustomSpan>
+                                )
+                                : (
+                                    <CustomSpan key={index} >
+                                        <img src={fields[field].svg}
+                                             width={"20px"}
+                                             height={"20px"}
+                                             style={{ verticalAlign: "top", marginLeft: "2px", marginRight: "10px"}}
+                                        />
+                                        <textarea readOnly={true} style={{width: "340px", resize: "none", border: "1px solid #ccc"}} rows={4}>
+                                            {fields[field].value}
+                                        </textarea>
+                                    </CustomSpan>
+                                )
+                        }
+                    </div>
+                ))
+            }
+        </div>
+    );
+}
+
+function CustomSpan(props) {
+    const { children } = props
+    return (
+        <span className="MuiTypography-root MuiTypography-caption MuiTypography-noWrap css-49fffr" style={{
+            width: "100%"
+        }}>
+            {children}
+        </span>
+    )
+}
+
 export function MyCourses(props) {
     const cal = useRef(null)
 
@@ -74,8 +130,9 @@ export function MyCourses(props) {
             start: new Date(x.startTime),
             end: new Date(x.endTime),
             status: x.status,
+            coach: x.owner.username,
             availableSlots: x.availableSlots,
-            registeredSlots: x.registeredSlots,
+            registeredSlots: x.registeredSlots || 0,
             draggable: !isReadOnly,
             deletable: !isReadOnly,
             editable: !isReadOnly
@@ -155,7 +212,7 @@ export function MyCourses(props) {
         }).then(res => {
             if (res.status === 200) {
                 JNotification.success("Successfully " + action)
-                e.event_id = res.data.data
+                e = getCoursesFromData([res.data.data])[0]
             }
         }).catch(error => {
             JNotification.danger("Failed to " + action);
@@ -215,6 +272,7 @@ export function MyCourses(props) {
                 onConfirm={(e, action) => handleConfirm(e, action)}
                 onEventDrop={(d, u, o) => handleConfirm(u, "edit")}
                 onDelete={handleDelete}
+                viewerExtraComponent={(f, e) => EventPopup(f, e)}
             />
         </div>
     )

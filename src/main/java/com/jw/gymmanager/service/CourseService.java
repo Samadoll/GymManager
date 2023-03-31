@@ -53,7 +53,7 @@ public class CourseService {
         var existedUser = user.get();
         courseEvent.setOwner(existedUser);
         courseRepository.save(courseEvent);
-        return JResponse.builder().status(200).data(courseEvent.getId()).build();
+        return JResponse.builder().status(200).data(courseEvent).build();
     }
 
     public JResponse deleteCourse(int currentUid, Integer id) {
