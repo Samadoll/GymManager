@@ -3,17 +3,13 @@ package com.jw.gymmanager.service;
 import com.jw.gymmanager.entity.CourseEvent;
 import com.jw.gymmanager.entity.JResponse;
 import com.jw.gymmanager.entity.Role;
-import com.jw.gymmanager.entity.User;
 import com.jw.gymmanager.repository.CourseRepository;
 import com.jw.gymmanager.repository.RegistrationRepository;
 import com.jw.gymmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +19,7 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final RegistrationRepository registrationRepository;
 
-    public JResponse getCourse(int currentUid) {
+    public JResponse getCourses(int currentUid) {
         var user = userRepository.findById(currentUid);
         if (user.isEmpty())
             return JResponse.builder().status(400).message("User Not Exist").build();
@@ -39,6 +35,15 @@ public class CourseService {
             courses = courseRepository.findCourseEventsByCourseRegistrationsIn(registrations.get());
         }
         return JResponse.builder().status(200).data(courses.isPresent() ? courses.get() : new ArrayList<>()).build();
+    }
+
+    public JResponse getCoachCourse(int id) {
+        var user = userRepository.findById(id);
+        if (user.isEmpty())
+            return JResponse.builder().status(400).message("Coach Not Exist").build();
+        var existedUser = user.get();
+        var courses = courseRepository.findCourseEventsByOwner(existedUser);
+        return JResponse.builder().status(200).data(courses.orElseGet(ArrayList::new)).build();
     }
 
     public JResponse createCourse(int currentUid, CourseEvent courseEvent) {

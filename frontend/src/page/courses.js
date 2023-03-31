@@ -8,6 +8,7 @@ export function MyCourses(props) {
 
     const [courses, setCourses] = useState([])
     const [fields, setFields] = useState([])
+    const [coaches, setCoaches] = useState([])
 
     async function fetchData() {
         try {
@@ -23,9 +24,31 @@ export function MyCourses(props) {
         }
     }
 
+    async function fetchCoaches() {
+        try {
+            Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
+            const res = await Axios.get("/api/v1/user/getCoaches");
+            const status = res.data.status;
+            if (status === 200) {
+                const data = res.data.data;
+                let result = data.map(x => { return {
+                    id: x.id,
+                    username: x.username
+                }})
+                setCoaches(result)
+            }
+        } catch (err) {
+            toaster.danger(err.response.data.message);
+        }
+    }
+
     useEffect(() => {
         fetchData();
+        if (props.userInfo.role === "TRAINEE") {
+            fetchCoaches();
+        }
     },[])
+
 
     function buildData(data) {
         buildCourses(data)
@@ -33,7 +56,6 @@ export function MyCourses(props) {
     }
 
     function buildCourses(data) {
-        // console.log(data)
         let result = data.map(x => { return {
             event_id: x.id,
             title: x.title,
@@ -98,20 +120,61 @@ export function MyCourses(props) {
                 .catch(error => {
                     toaster.danger("Failed to Create Course");
                 })
-            setCourses(cal.current.scheduler.events)
-            console.log(cal.current.scheduler.events)
             return e;
         } else {
 
         }
     }
 
+    async function getCoachCourse(id) {
+        if (id == "") {
+            cal.current.scheduler.handleState(courses, "events");
+            return;
+        }
+        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
+        await Axios.get("/api/v1/course/getCourse/" + id)
+            .then(res => {
+                if (res.status === 200) {
+                    let result = res.data.data.map(x => { return {
+                        event_id: x.id,
+                        title: x.title,
+                        description: x.description,
+                        start: new Date(x.startTime),
+                        end: new Date(x.endTime),
+                        status: x.status
+                    }})
+                    cal.current.scheduler.handleState(courses.concat(result), "events");
+                }
+            })
+            .catch(error => {
+                toaster.danger("Failed to Load Course");
+            })
+    }
+
     return (
         <div style={{width: "80%", "margin": "auto", "background": "white", "border": "1px solid #ccc"}}>
+            {
+                coaches.length <= 0
+                    ? null
+                    : (
+                        <select
+                            onChange={e => getCoachCourse(e.target.value)}
+                        >
+                            <option key={-1} label="My Courses"/>
+                            {
+                                coaches.map((coach, index) =>
+                                    <option
+                                        key={index}
+                                        value={coach.id}
+                                        label={coach.username}
+                                    />
+                                )
+                            }
+                        </select>
+                    )
+            }
             <button onClick={() => {
-                console.log(courses)
-                console.log(cal.current.scheduler)
-                cal.current.scheduler.handleState(courses, "events")
+                getCoachCourse(1);
             }}>Test</button>
             <Scheduler
                 ref={cal}

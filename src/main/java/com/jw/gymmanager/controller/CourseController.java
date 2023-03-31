@@ -17,7 +17,12 @@ public class CourseController {
 
     @GetMapping("/getCourses")
     public ResponseEntity<JResponse> getCourses() {
-        return ResponseEntity.ok(courseService.getCourse(Util.getCurrentUid()));
+        return ResponseEntity.ok(courseService.getCourses(Util.getCurrentUid()));
+    }
+
+    @GetMapping("/getCourse/{id}")
+    public ResponseEntity<JResponse> getCourse(@PathVariable Integer id) {
+        return ResponseEntity.ok(courseService.getCoachCourse(id));
     }
 
     @PostMapping("/createCourse")

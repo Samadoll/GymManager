@@ -23,7 +23,7 @@ export function Login(props) {
                     const uid = data.uid;
                     localStorage.setItem("Authorization", token);
                     Axios.defaults.headers.Authorization = token;
-                    props.login({ username: username, uid: uid });
+                    props.login({ username: username, uid: uid, role: data.role });
                     navigate("/")
                     toaster.success(`Welcome, ${username}!`);
                 }

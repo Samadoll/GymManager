@@ -13,7 +13,8 @@ export function Routex() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userInfo, setUserInfo] = useState({
         username: "",
-        uid: 0
+        uid: 0,
+        role: ""
     });
     const [isLoading, setIsLoading] = useState(true)
 
@@ -27,7 +28,8 @@ export function Routex() {
         delete Axios.defaults.headers.Authorization;
         setUserInfo({
             username: "",
-            uid: 0
+            uid: 0,
+            role: ""
         });
         setIsLoggedIn(false);
     }
@@ -42,7 +44,8 @@ export function Routex() {
                 if (status === 200) {
                     setUserInfo({
                         username: res.data.username,
-                        uid: res.data.uid
+                        uid: res.data.uid,
+                        role: res.data.role
                     });
                     setIsLoggedIn(true);
                 } else {
@@ -82,7 +85,7 @@ export function Routex() {
                                     isLoggedIn ? (<MyInfo isLoggedIn={isLoggedIn} userInfo={userInfo} logout={logout} />) : (<About />)
                                 }/>
                                 <Route exact path="/myCourses" element={
-                                    isLoggedIn ? (<MyCourses />) : (<About />)
+                                    isLoggedIn ? (<MyCourses userInfo={userInfo} />) : (<About />)
                                 }/>
                                 <Route path="/loginPage" element={
                                     isLoggedIn ? (<Navigate to="/" />) : (<Login login={login} />)
