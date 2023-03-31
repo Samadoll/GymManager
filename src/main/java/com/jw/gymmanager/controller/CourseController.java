@@ -35,4 +35,9 @@ public class CourseController {
         return ResponseEntity.ok(courseService.createEditCourse(Util.getCurrentUid(), courseEvent));
     }
 
+    @DeleteMapping("/deleteCourse/{id}")
+    public ResponseEntity<JResponse> deleteCourse(@PathVariable Integer id) {
+        return ResponseEntity.ok(courseService.deleteCourse(Util.getCurrentUid(), id));
+    }
+
 }

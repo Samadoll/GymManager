@@ -83,6 +83,24 @@ export function MyCourses(props) {
         return result;
     }
 
+    async function getCoachCourse(id) {
+        if (id == "") {
+            cal.current.scheduler.handleState(courses, "events");
+            return;
+        }
+        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
+        await Axios.get("/api/v1/course/getCourse/" + id)
+            .then(res => {
+                if (res.status === 200) {
+                    let result = getCoursesFromData(res.data.data)
+                    cal.current.scheduler.handleState(courses.concat(result), "events");
+                }
+            })
+            .catch(error => {
+                JNotification.danger("Failed to Load Course");
+            })
+    }
+
     function buildFields() {
         let res = [
             {
@@ -141,26 +159,25 @@ export function MyCourses(props) {
             }
         }).catch(error => {
             JNotification.danger("Failed to " + action);
+            throw new Error("Failed to " + action)
         })
         return e;
     }
 
-    async function getCoachCourse(id) {
-        if (id == "") {
-            cal.current.scheduler.handleState(courses, "events");
-            return;
-        }
+    async function handleDelete(id) {
         Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
-        await Axios.get("/api/v1/course/getCourse/" + id)
-            .then(res => {
-                if (res.status === 200) {
-                    let result = getCoursesFromData(res.data.data)
-                    cal.current.scheduler.handleState(courses.concat(result), "events");
-                }
-            })
-            .catch(error => {
-                JNotification.danger("Failed to Load Course");
-            })
+        await Axios.delete("/api/v1/course/deleteCourse/" + id
+        ).then(res => {
+            if (res.status === 200) {
+                JNotification.success("Successfully Deleted")
+            } else {
+                throw new Error("Failed to Delete")
+            }
+        }).catch(error => {
+            JNotification.danger("Failed to Delete");
+            throw new Error("Failed to Delete")
+        })
+        return id
     }
 
     return (
@@ -197,6 +214,7 @@ export function MyCourses(props) {
                 // events={courses}
                 onConfirm={(e, action) => handleConfirm(e, action)}
                 onEventDrop={(d, u, o) => handleConfirm(u, "edit")}
+                onDelete={handleDelete}
             />
         </div>
     )

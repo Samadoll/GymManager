@@ -55,4 +55,17 @@ public class CourseService {
         courseRepository.save(courseEvent);
         return JResponse.builder().status(200).data(courseEvent.getId()).build();
     }
+
+    public JResponse deleteCourse(int currentUid, Integer id) {
+        var user = userRepository.findById(currentUid);
+        if (user.isEmpty())
+            return JResponse.builder().status(400).message("Not Allowed to Delete").build();
+        var existedUser = user.get();
+        var course = courseRepository.findCourseEventByIdAndOwner(id, existedUser);
+        if (course.isPresent()) {
+            courseRepository.deleteById(id);
+            return JResponse.builder().status(200).data(id).build();
+        }
+        return JResponse.builder().status(400).message("Not Allowed to Delete").build();
+    }
 }
