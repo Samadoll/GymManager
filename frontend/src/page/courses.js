@@ -124,6 +124,7 @@ export function MyCourses(props) {
 
     useEffect(() => {
         fetchData();
+        buildFields();
         if (props.userInfo.role === "TRAINEE") {
             fetchCoaches();
             cal.current.scheduler.week.cellRenderer = ({ height, start, onClick, ...props }) => (<Button disableRipple={true}></Button>);
@@ -135,7 +136,6 @@ export function MyCourses(props) {
 
     function buildData(data) {
         buildCourses(data);
-        buildFields();
     }
 
     function buildCourses(data) {
@@ -178,16 +178,25 @@ export function MyCourses(props) {
     }
 
     async function getCoachCourse(id) {
-        if (id == "") {
-            cal.current.scheduler.handleState(courses, "events");
+        if (id === "") {
+            await fetchData()
             return;
         }
         Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
         await Axios.get("/api/v1/course/getCourse/" + id)
             .then(res => {
                 if (res.status === 200) {
-                    let result = getCoursesFromData(res.data.data, false)
-                    cal.current.scheduler.handleState(courses.concat(result), "events");
+                    let data = getCoursesFromData(res.data.data, false)
+                    const tempSet = new Set();
+                    const result = [];
+                    courses.forEach((course, _) => {
+                        tempSet.add(course.event_id);
+                        result.push(course)
+                    });
+                    data.forEach((course, _) => {
+                        if (!tempSet.has(course.event_id)) result.push(course);
+                    });
+                    cal.current.scheduler.handleState(result, "events");
                 }
             })
             .catch(error => {
@@ -295,10 +304,16 @@ export function MyCourses(props) {
             JNotification.danger("Failed to " + action);
             throw new Error("Failed to " + action)
         })
+        closeView();
+    }
+
+    function closeView() {
+        const button = document.querySelector('[data-testid="ClearRoundedIcon"]').parentNode;
+        if (button != null) button.click();
     }
 
     return (
-        <div style={{width: "80%", "margin": "auto", "background": "white", "border": "1px solid #ccc"}}>
+        <div className="table-content">
             {
                 coaches.length <= 0
                     ? null
@@ -320,7 +335,7 @@ export function MyCourses(props) {
                     )
             }
             <button onClick={() => {
-                getCoachCourse(1);
+                console.log(cal.current.scheduler)
             }}>Test</button>
             <Scheduler
                 ref={cal}
