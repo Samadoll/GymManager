@@ -4,13 +4,26 @@ import Scheduler from "@aldabil/react-scheduler";
 import JNotification from "../component/jNotification";
 import { Button } from "@mui/material";
 
-function EventPopup(f, event) {
+const EventColours = {
+    "INITIAL": "#7149C6",
+    "ACTIVE": "#FE6244",
+    "CANCELLED": "#FC2947",
+    "REGISTERED": "#FFDEB9"
+};
 
+function EventPopup(f, event, userInfo, fn) {
     const fields = {
         "Coach": { value: event.coach, renderType: "span", svg: "../person.svg"},
         "Status": { value: event.status, renderType: "span", svg: "../status.svg"},
         "Slots": { value: (event.registeredSlots || 0) + " / " + event.availableSlots, renderType: "span", svg: "../group.svg"},
         "Description": { value: event.description, renderType: "text", svg: "../text.svg"}
+    };
+
+    let action = "";
+    if (userInfo.role === "COACH") {
+        action = !event.published ? "PUBLISH" : (event.status === "ACTIVE" ? "CANCEL" : "ACTIVATE");
+    } else {
+        action = event.isRegistered ? "DEREGISTER" : "REGISTER";
     }
 
     return (
@@ -44,6 +57,16 @@ function EventPopup(f, event) {
                         }
                     </div>
                 ))
+            }
+            {
+                action === "" || (event.status === "CANCELLED" && userInfo.role !== "COACH")
+                    ? null
+                    : (
+                        <button
+                            onClick={() => { fn.apply(null, [event, action]); }}
+                            className="login-register-button-primary"
+                        >{action}</button>
+                    )
             }
         </div>
     );
@@ -116,13 +139,14 @@ export function MyCourses(props) {
     }
 
     function buildCourses(data) {
-        let result = getCoursesFromData(data);
+        let result = getCoursesFromData(data, true);
         cal.current.scheduler.handleState(result, "events");
         setCourses(result);
     }
 
-    function getCoursesFromData(data) {
+    function getCoursesFromData(data, isRegistered) {
         let isReadOnly = props.userInfo.role === "TRAINEE"
+        isRegistered = props.userInfo.role === "COACH" ? false : isRegistered;
         let result = data.map(x => { return {
             event_id: x.id,
             title: x.title,
@@ -133,11 +157,24 @@ export function MyCourses(props) {
             coach: x.owner.username,
             availableSlots: x.availableSlots,
             registeredSlots: x.registeredSlots || 0,
-            draggable: !isReadOnly,
-            deletable: !isReadOnly,
-            editable: !isReadOnly
+            draggable: !isReadOnly && !x.published,
+            deletable: !isReadOnly && !x.published,
+            editable: !isReadOnly && !x.published,
+            published: x.published,
+            isRegistered: isRegistered,
+            color: getEventColor(x, isRegistered)
         }});
         return result;
+    }
+
+    function getEventColor(event, isRegistered) {
+        if (event.status === "CANCELLED")
+            return EventColours["CANCELLED"];
+        if (isRegistered)
+            return EventColours["REGISTERED"];
+        if (event.published)
+            return EventColours["ACTIVE"];
+        return EventColours["INITIAL"];
     }
 
     async function getCoachCourse(id) {
@@ -149,7 +186,7 @@ export function MyCourses(props) {
         await Axios.get("/api/v1/course/getCourse/" + id)
             .then(res => {
                 if (res.status === 200) {
-                    let result = getCoursesFromData(res.data.data)
+                    let result = getCoursesFromData(res.data.data, false)
                     cal.current.scheduler.handleState(courses.concat(result), "events");
                 }
             })
@@ -164,8 +201,7 @@ export function MyCourses(props) {
                 name: "status",
                 type: "select",
                 options: [
-                    { id: 1, text: "Active", value: "ACTIVE" },
-                    { id: 2, text: "Cancelled", value: "CANCELLED" }
+                    { id: 1, text: "Active", value: "ACTIVE" }
                 ],
                 default: "ACTIVE",
                 config: { label: "Status" }
@@ -212,7 +248,7 @@ export function MyCourses(props) {
         }).then(res => {
             if (res.status === 200) {
                 JNotification.success("Successfully " + action)
-                e = getCoursesFromData([res.data.data])[0]
+                e = getCoursesFromData([res.data.data], false)[0]
             }
         }).catch(error => {
             JNotification.danger("Failed to " + action);
@@ -235,6 +271,30 @@ export function MyCourses(props) {
             throw new Error("Failed to Delete")
         })
         return id
+    }
+
+    async function handlePopupButton(event, action) {
+        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
+        let query = new FormData();
+        query.append("action", action.toLowerCase());
+        query.append("id", event.event_id);
+        await Axios({
+            method: "post",
+            url: "/api/v1/course/actionCourse",
+            data: query,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => {
+            if (res.status === 200) {
+                JNotification.success("Successfully " + action);
+                let event = getCoursesFromData([res.data.data], action === "REGISTER")[0];
+                cal.current.scheduler.confirmEvent(event, "edit");
+            }
+        }).catch(error => {
+            JNotification.danger("Failed to " + action);
+            throw new Error("Failed to " + action)
+        })
     }
 
     return (
@@ -272,7 +332,7 @@ export function MyCourses(props) {
                 onConfirm={(e, action) => handleConfirm(e, action)}
                 onEventDrop={(d, u, o) => handleConfirm(u, "edit")}
                 onDelete={handleDelete}
-                viewerExtraComponent={(f, e) => EventPopup(f, e)}
+                viewerExtraComponent={(f, e) => EventPopup(f, e, props.userInfo, handlePopupButton)}
             />
         </div>
     )

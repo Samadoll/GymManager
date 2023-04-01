@@ -26,6 +26,7 @@ public class CourseEvent {
     private String description;
     @Enumerated(EnumType.STRING)
     private CourseStatus status;
+    private boolean isPublished;
     @Enumerated(EnumType.STRING)
     private CourseType type;
     @ManyToOne(fetch = FetchType.LAZY)

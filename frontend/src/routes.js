@@ -93,7 +93,7 @@ export function Routex() {
                                 <Route exact path="/registerPage" element={
                                     isLoggedIn ? (<Navigate to="/" />) : (<Register />)
                                 }/>
-                                <Route exact path="/about" element={<MyCourses />} />
+                                <Route exact path="/about" element={<About />} />
                             </Routes>
                         )
                 }

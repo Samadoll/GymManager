@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+
 @RestController
 @RequestMapping("/api/v1/course")
 @RequiredArgsConstructor
@@ -22,7 +24,7 @@ public class CourseController {
 
     @GetMapping("/getCourse/{id}")
     public ResponseEntity<JResponse> getCourse(@PathVariable Integer id) {
-        return ResponseEntity.ok(courseService.getCoachCourse(id));
+        return ResponseEntity.ok(courseService.getCoachCourse(Util.getCurrentUid(), id));
     }
 
     @PostMapping("/createCourse")
@@ -38,6 +40,13 @@ public class CourseController {
     @DeleteMapping("/deleteCourse/{id}")
     public ResponseEntity<JResponse> deleteCourse(@PathVariable Integer id) {
         return ResponseEntity.ok(courseService.deleteCourse(Util.getCurrentUid(), id));
+    }
+
+    @PostMapping("/actionCourse")
+    public ResponseEntity<JResponse> actionOnCourse(@RequestBody HashMap<String, String> data) {
+        var id = Integer.parseInt(data.get("id"));
+        var action = data.get("action");
+        return ResponseEntity.ok(courseService.actionOnCourse(Util.getCurrentUid(), id, action.toUpperCase()));
     }
 
 }
