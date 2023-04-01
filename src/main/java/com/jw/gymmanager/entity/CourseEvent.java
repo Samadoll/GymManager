@@ -1,5 +1,6 @@
 package com.jw.gymmanager.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,10 +30,11 @@ public class CourseEvent {
     private boolean isPublished;
     @Enumerated(EnumType.STRING)
     private CourseType type;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private User owner;
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     @ToString.Exclude
+    @JsonIgnore
     Set<CourseRegistration> courseRegistrations = new HashSet<>();
 }

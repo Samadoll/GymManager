@@ -1,9 +1,6 @@
 package com.jw.gymmanager.service;
 
-import com.jw.gymmanager.entity.CourseEvent;
-import com.jw.gymmanager.entity.CourseStatus;
-import com.jw.gymmanager.entity.JResponse;
-import com.jw.gymmanager.entity.Role;
+import com.jw.gymmanager.entity.*;
 import com.jw.gymmanager.repository.CourseRepository;
 import com.jw.gymmanager.repository.RegistrationRepository;
 import com.jw.gymmanager.repository.UserRepository;
@@ -87,10 +84,16 @@ public class CourseService {
         if (user.isEmpty())
             return JResponse.builder().status(400).message("Not Allowed to " + action).build();
         var existedUser = user.get();
-        var course = courseRepository.findCourseEventByIdAndOwner(eventId, existedUser);
-        if (course.isPresent()) {
-            var c = existedUser.getRole() == Role.COACH ? ownerActionOnCourse(course.get(), action) : traineeActionOnCourse(course.get(), action);
-            return JResponse.builder().status(200).data(c).build();
+        var course = courseRepository.findById(eventId).orElseGet(null);
+        if (course != null) {
+            CourseEvent returnCourse = null;
+            if (existedUser.getRole() == Role.COACH && existedUser.getId().equals(course.getOwner().getId())) {
+                returnCourse = ownerActionOnCourse(course, action);
+            } else if (existedUser.getRole() == Role.TRAINEE) {
+                returnCourse = traineeActionOnCourse(existedUser, course, action);
+            }
+            if (returnCourse != null)
+                return JResponse.builder().status(200).data(returnCourse).build();
         }
         return JResponse.builder().status(400).message("Not Allowed to " + action).build();
     }
@@ -104,16 +107,24 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
-    private CourseEvent traineeActionOnCourse(CourseEvent course, String action) {
+    private CourseEvent traineeActionOnCourse(User trainee, CourseEvent course, String action) {
         switch (action) {
             case "REGISTER" -> {
-                // TODO
+                if (course.getRegisteredSlots() < course.getAvailableSlots()) {
+                    registrationRepository.save(CourseRegistration.builder().trainee(trainee).course(course).build());
+                    course.setRegisteredSlots(course.getRegisteredSlots() + 1);
+                    return courseRepository.save(course);
+                }
             }
             case "DEREGISTER" -> {
-                // TODO: 2
+                var registration = registrationRepository.findCourseRegistrationByCourseAndTrainee(course, trainee);
+                if (registration.isPresent()) {
+                    registrationRepository.delete(registration.get());
+                    course.setRegisteredSlots(course.getRegisteredSlots() - 1);
+                    return courseRepository.save(course);
+                }
             }
         }
-        return course;
+        return null;
     }
-
 }

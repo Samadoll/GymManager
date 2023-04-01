@@ -27,9 +27,11 @@ public class User implements UserDetails {
     private Role role;
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     @ToString.Exclude
+    @JsonIgnore
     Set<CourseEvent> courseEvents = new HashSet<>();
     @OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL)
     @ToString.Exclude
+    @JsonIgnore
     Set<CourseRegistration> courseRegistrations = new HashSet<>();
 
     @Override
