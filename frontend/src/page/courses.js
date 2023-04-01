@@ -1,15 +1,15 @@
-import React, {useEffect, useRef, useState} from "react";
-import Axios from "axios";
-import Scheduler from "@aldabil/react-scheduler";
-import JNotification from "../component/jNotification";
-import { Button } from "@mui/material";
+import React, {useEffect, useRef, useState} from "react"
+import Axios from "axios"
+import Scheduler from "@aldabil/react-scheduler"
+import JNotification from "../component/jNotification"
+import {Button} from "@mui/material"
 
 const EventColours = {
     "INITIAL": "#7149C6",
     "ACTIVE": "#FE6244",
     "CANCELLED": "#FC2947",
     "REGISTERED": "#FFDEB9"
-};
+}
 
 function EventPopup(f, event, userInfo, fn) {
     const fields = {
@@ -17,13 +17,13 @@ function EventPopup(f, event, userInfo, fn) {
         "Status": { value: event.status, renderType: "span", svg: "../status.svg"},
         "Slots": { value: (event.registeredSlots || 0) + " / " + event.availableSlots, renderType: "span", svg: "../group.svg"},
         "Description": { value: event.description, renderType: "text", svg: "../text.svg"}
-    };
+    }
 
-    let action = "";
+    let action = ""
     if (userInfo.role === "COACH") {
-        action = !event.published ? "PUBLISH" : (event.status === "ACTIVE" ? "CANCEL" : "ACTIVATE");
+        action = !event.published ? "PUBLISH" : (event.status === "ACTIVE" ? "CANCEL" : "ACTIVATE")
     } else {
-        action = event.isRegistered ? "DEREGISTER" : "REGISTER";
+        action = event.isRegistered ? "DEREGISTER" : "REGISTER"
     }
 
     return (
@@ -63,13 +63,13 @@ function EventPopup(f, event, userInfo, fn) {
                     ? null
                     : (
                         <button
-                            onClick={() => { fn.apply(null, [event, action]); }}
+                            onClick={() => { fn.apply(null, [event, action]) }}
                             className="login-register-button-primary"
                         >{action}</button>
                     )
             }
         </div>
-    );
+    )
 }
 
 function CustomSpan(props) {
@@ -85,32 +85,30 @@ function CustomSpan(props) {
 
 export function MyCourses(props) {
     const cal = useRef(null)
-
-    const [courses, setCourses] = useState([])
-    const [fields, setFields] = useState([])
+    const courses = useRef([])
     const [coaches, setCoaches] = useState([])
 
     async function fetchData() {
         try {
-            Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
-            const res = await Axios.get("/api/v1/course/getCourses");
-            const status = res.data.status;
+            Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "")
+            const res = await Axios.get("/api/v1/course/getCourses")
+            const status = res.data.status
             if (status === 200) {
-                const data = res.data.data;
+                const data = res.data.data
                 buildData(data)
             }
         } catch (err) {
-            JNotification.danger(err.response.data.message);
+            JNotification.danger(err.response.data.message)
         }
     }
 
     async function fetchCoaches() {
         try {
-            Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
-            const res = await Axios.get("/api/v1/user/getCoaches");
-            const status = res.data.status;
+            Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "")
+            const res = await Axios.get("/api/v1/user/getCoaches")
+            const status = res.data.status
             if (status === 200) {
-                const data = res.data.data;
+                const data = res.data.data
                 let result = data.map(x => { return {
                     id: x.id,
                     username: x.username
@@ -118,89 +116,90 @@ export function MyCourses(props) {
                 setCoaches(result)
             }
         } catch (err) {
-            JNotification.danger(err.response.data.message);
+            JNotification.danger(err.response.data.message)
         }
     }
 
     useEffect(() => {
-        fetchData();
-        buildFields();
+        fetchData()
+        buildFields()
         if (props.userInfo.role === "TRAINEE") {
-            fetchCoaches();
-            cal.current.scheduler.week.cellRenderer = ({ height, start, onClick, ...props }) => (<Button disableRipple={true}></Button>);
+            fetchCoaches()
+            cal.current.scheduler.week.cellRenderer = ({ height, start, onClick, ...props }) => (<Button disableRipple={true}></Button>)
         } else {
-            delete cal.current.scheduler.week.cellRenderer;
+            delete cal.current.scheduler.week.cellRenderer
         }
     },[])
 
 
     function buildData(data) {
-        buildCourses(data);
+        buildCourses(data)
     }
 
     function buildCourses(data) {
-        let result = getCoursesFromData(data, true);
-        cal.current.scheduler.handleState(result, "events");
-        setCourses(result);
+        let result = getCoursesFromData(data, true)
+        cal.current.scheduler.handleState(result, "events")
+        courses.current = result
     }
 
     function getCoursesFromData(data, isRegistered) {
         let isReadOnly = props.userInfo.role === "TRAINEE"
-        isRegistered = props.userInfo.role === "COACH" ? false : isRegistered;
-        let result = data.map(x => { return {
-            event_id: x.id,
-            title: x.title,
-            description: x.description,
-            start: new Date(x.startTime),
-            end: new Date(x.endTime),
-            status: x.status,
-            coach: x.owner.username,
-            availableSlots: x.availableSlots,
-            registeredSlots: x.registeredSlots || 0,
-            draggable: !isReadOnly && !x.published,
-            deletable: !isReadOnly && !x.published,
-            editable: !isReadOnly && !x.published,
-            published: x.published,
-            isRegistered: isRegistered,
-            color: getEventColor(x, isRegistered)
-        }});
-        return result;
+        isRegistered = props.userInfo.role === "COACH" ? false : isRegistered
+        return data.map(x => {
+            return {
+                event_id: x.id,
+                title: x.title,
+                description: x.description,
+                start: new Date(x.startTime),
+                end: new Date(x.endTime),
+                status: x.status,
+                coach: x.owner.username,
+                availableSlots: x.availableSlots,
+                registeredSlots: x.registeredSlots || 0,
+                draggable: !isReadOnly && !x.published,
+                deletable: !isReadOnly && !x.published,
+                editable: !isReadOnly && !x.published,
+                published: x.published,
+                isRegistered: isRegistered,
+                color: getEventColor(x, isRegistered)
+            }
+        })
     }
 
     function getEventColor(event, isRegistered) {
         if (event.status === "CANCELLED")
-            return EventColours["CANCELLED"];
+            return EventColours["CANCELLED"]
         if (isRegistered)
-            return EventColours["REGISTERED"];
+            return EventColours["REGISTERED"]
         if (event.published)
-            return EventColours["ACTIVE"];
-        return EventColours["INITIAL"];
+            return EventColours["ACTIVE"]
+        return EventColours["INITIAL"]
     }
 
     async function getCoachCourse(id) {
         if (id === "") {
             await fetchData()
-            return;
+            return
         }
-        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
+        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "")
         await Axios.get("/api/v1/course/getCourse/" + id)
             .then(res => {
                 if (res.status === 200) {
                     let data = getCoursesFromData(res.data.data, false)
-                    const tempSet = new Set();
-                    const result = [];
-                    courses.forEach((course, _) => {
-                        tempSet.add(course.event_id);
+                    const tempSet = new Set()
+                    const result = []
+                    courses.current.forEach((course, _) => {
+                        tempSet.add(course.event_id)
                         result.push(course)
-                    });
+                    })
                     data.forEach((course, _) => {
-                        if (!tempSet.has(course.event_id)) result.push(course);
-                    });
-                    cal.current.scheduler.handleState(result, "events");
+                        if (!tempSet.has(course.event_id)) result.push(course)
+                    })
+                    cal.current.scheduler.handleState(result, "events")
                 }
             })
             .catch(error => {
-                JNotification.danger("Failed to Load Course");
+                JNotification.danger("Failed to Load Course")
             })
     }
 
@@ -229,17 +228,16 @@ export function MyCourses(props) {
             }
         ]
         cal.current.scheduler.handleState(res, "fields")
-        setFields(res)
     }
 
     async function handleConfirm(e, action) {
-        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
-        const query = new FormData();
-        query.append("startTime", e.start.getTime());
-        query.append("endTime", e.end.getTime());
+        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "")
+        const query = new FormData()
+        query.append("startTime", e.start.getTime())
+        query.append("endTime", e.end.getTime())
         query.append("availableSlots", e.availableSlots)
         query.append("registeredSlots", e.registeredSlots || 0)
-        query.append("title", e.title);
+        query.append("title", e.title)
         query.append("description", e.description)
         query.append("status", e.status)
         let url = action === "create" ? "/api/v1/course/createCourse" : "/api/v1/course/editCourse"
@@ -260,14 +258,14 @@ export function MyCourses(props) {
                 e = getCoursesFromData([res.data.data], false)[0]
             }
         }).catch(error => {
-            JNotification.danger("Failed to " + action);
+            JNotification.danger("Failed to " + action)
             throw new Error("Failed to " + action)
         })
-        return e;
+        return e
     }
 
     async function handleDelete(id) {
-        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
+        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "")
         await Axios.delete("/api/v1/course/deleteCourse/" + id
         ).then(res => {
             if (res.status === 200) {
@@ -276,17 +274,17 @@ export function MyCourses(props) {
                 throw new Error("Failed to Delete")
             }
         }).catch(error => {
-            JNotification.danger("Failed to Delete");
+            JNotification.danger("Failed to Delete")
             throw new Error("Failed to Delete")
         })
         return id
     }
 
     async function handlePopupButton(event, action) {
-        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
-        let query = new FormData();
-        query.append("action", action.toLowerCase());
-        query.append("id", event.event_id);
+        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "")
+        let query = new FormData()
+        query.append("action", action.toLowerCase())
+        query.append("id", event.event_id)
         await Axios({
             method: "post",
             url: "/api/v1/course/actionCourse",
@@ -296,20 +294,27 @@ export function MyCourses(props) {
             }
         }).then(res => {
             if (res.status === 200) {
-                JNotification.success("Successfully " + action);
-                let event = getCoursesFromData([res.data.data], action === "REGISTER")[0];
-                cal.current.scheduler.confirmEvent(event, "edit");
+                JNotification.success("Successfully " + action)
+                let event = getCoursesFromData([res.data.data], action === "REGISTER")[0]
+                cal.current.scheduler.confirmEvent(event, "edit")
+                if (props.userInfo.role === "TRAINEE") {
+                    if (action === "DEREGISTER") {
+                        courses.current = courses.current.filter(t => t.event_id !== event.event_id)
+                    } else {
+                        courses.current.push(event)
+                    }
+                }
             }
         }).catch(error => {
-            JNotification.danger("Failed to " + action);
+            JNotification.danger("Failed to " + action)
             throw new Error("Failed to " + action)
         })
-        closeView();
+        closeView()
     }
 
     function closeView() {
-        const button = document.querySelector('[data-testid="ClearRoundedIcon"]').parentNode;
-        if (button != null) button.click();
+        const button = document.querySelector('[data-testid="ClearRoundedIcon"]').parentNode
+        if (button != null) button.click()
     }
 
     return (
@@ -342,8 +347,6 @@ export function MyCourses(props) {
                 view="week"
                 day={null}
                 month={null}
-                // fields={fields}
-                // events={courses}
                 onConfirm={(e, action) => handleConfirm(e, action)}
                 onEventDrop={(d, u, o) => handleConfirm(u, "edit")}
                 onDelete={handleDelete}
