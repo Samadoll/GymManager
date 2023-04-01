@@ -1,5 +1,6 @@
 package com.jw.gymmanager.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,15 +20,18 @@ public class User implements UserDetails {
     private Integer id;
     @Column(unique=true)
     private String username;
+    @JsonIgnore
     private String password;
     private Long registerTime;
     @Enumerated(EnumType.STRING)
     private Role role;
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     @ToString.Exclude
+    @JsonIgnore
     Set<CourseEvent> courseEvents = new HashSet<>();
     @OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL)
     @ToString.Exclude
+    @JsonIgnore
     Set<CourseRegistration> courseRegistrations = new HashSet<>();
 
     @Override

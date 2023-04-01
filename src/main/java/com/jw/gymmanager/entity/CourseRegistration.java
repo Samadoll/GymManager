@@ -16,10 +16,10 @@ public class CourseRegistration {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "course_id", referencedColumnName = "id")
     private CourseEvent course;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "trainee_id", referencedColumnName = "id")
     private User trainee;
 

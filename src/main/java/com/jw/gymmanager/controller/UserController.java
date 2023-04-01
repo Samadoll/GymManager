@@ -23,4 +23,9 @@ public class UserController {
     public ResponseEntity<JResponse> getUserInfo() {
         return ResponseEntity.ok(userService.getUserInfo(Util.getCurrentUid()));
     }
+
+    @GetMapping("/getCoaches")
+    public ResponseEntity<JResponse> getCoaches() {
+        return ResponseEntity.ok(userService.getCoaches());
+    }
 }

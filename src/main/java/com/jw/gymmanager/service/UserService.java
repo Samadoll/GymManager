@@ -10,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 @Service
@@ -28,6 +29,13 @@ public class UserService {
                 .status(200)
                 .data(existedUser)
                 .build();
+    }
+
+    public JResponse getCoaches() {
+        var coaches = userRepository.findUsersByRole(Role.COACH);
+        if (coaches.isEmpty())
+            return JResponse.builder().status(400).message("No Coaches").build();
+        return JResponse.builder().status(200).data(coaches.orElseGet(ArrayList::new)).build();
     }
 
 //    public void updatePassword(int uid, String password) {

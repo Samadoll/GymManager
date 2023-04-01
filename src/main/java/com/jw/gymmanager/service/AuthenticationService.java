@@ -37,11 +37,15 @@ public class AuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         var user = userRepository.findByUsername(request.getUsername()).orElseThrow();
-        return AuthenticationResponse.builder().token(JwtUtil.generateToken(user)).uid(user.getId()).build();
+        return AuthenticationResponse.builder().token(JwtUtil.generateToken(user)).uid(user.getId()).role(user.getRole()).build();
     }
 
     public AuthenticationResponse checkAuth(){
         var principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return AuthenticationResponse.builder().uid(principal.getId()).username(principal.getUsername()).build();
+        return AuthenticationResponse.builder()
+                .uid(principal.getId())
+                .username(principal.getUsername())
+                .role(principal.getRole())
+                .build();
     }
 }

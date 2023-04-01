@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import Axios from "axios"
-import {toaster} from "evergreen-ui";
+import JNotification from "../component/jNotification";
 
 export function Register() {
     const [username, setUsername] = useState("");
@@ -14,15 +14,15 @@ export function Register() {
     function handleRegister() {
         const regex = new RegExp(/^[a-zA-Z0-9]+$/g);
         if (!regex.test(username)) {
-            toaster.danger("Invalid Username (Alphanumeric only)");
+            JNotification.danger("Invalid Username (Alphanumeric only)");
             return;
         }
         if (confirm !== password) {
-            toaster.danger("Password Not Match");
+            JNotification.danger("Password Not Match");
             return;
         }
         if (role === "" || role === undefined) {
-            toaster.danger("Member Role Not Select");
+            JNotification.danger("Member Role Not Select");
             return;
         }
         const query = new FormData();
@@ -35,12 +35,12 @@ export function Register() {
             }})
             .then(res => {
                 if (res.status === 200) {
-                    toaster.success("Successfully Registered")
+                    JNotification.success("Successfully Registered")
                     navigate("/loginPage")
                 }
             })
             .catch(error => {
-                toaster.danger("User Already Existed");
+                JNotification.danger("User Already Existed");
             })
     }
 
