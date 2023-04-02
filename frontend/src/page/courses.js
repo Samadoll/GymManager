@@ -154,6 +154,7 @@ export function MyCourses(props) {
                 end: new Date(x.endTime),
                 status: x.status,
                 coach: x.owner.username,
+                coachId: x.owner.id,
                 availableSlots: x.availableSlots,
                 registeredSlots: x.registeredSlots || 0,
                 draggable: !isReadOnly && !x.published,
@@ -300,6 +301,11 @@ export function MyCourses(props) {
                 if (props.userInfo.role === "TRAINEE") {
                     if (action === "DEREGISTER") {
                         courses.current = courses.current.filter(t => t.event_id !== event.event_id)
+                        let currentCoachId = document.querySelector("#coachSelector").value
+                        if (event.coachId.toString() !== currentCoachId) {
+                            let updatedEvents = cal.current.scheduler.events.filter(t => t.event_id !== event.event_id)
+                            cal.current.scheduler.handleState(updatedEvents, "events")
+                        }
                     } else {
                         courses.current.push(event)
                     }
@@ -313,8 +319,11 @@ export function MyCourses(props) {
     }
 
     function closeView() {
-        const button = document.querySelector('[data-testid="ClearRoundedIcon"]').parentNode
-        if (button != null) button.click()
+        const icon = document.querySelector('[data-testid="ClearRoundedIcon"]')
+        if (icon != null) {
+            const button = icon.parentNode;
+            if (button != null) button.click()
+        }
     }
 
     return (
@@ -324,6 +333,7 @@ export function MyCourses(props) {
                     ? null
                     : (
                         <select
+                            id={"coachSelector"}
                             onChange={e => getCoachCourse(e.target.value)}
                         >
                             <option key={-1} label="My Courses"/>
@@ -341,6 +351,7 @@ export function MyCourses(props) {
             }
             <button onClick={() => {
                 console.log(cal.current.scheduler)
+                console.log(document.querySelector("#coachSelector").value)
             }}>Test</button>
             <Scheduler
                 ref={cal}
