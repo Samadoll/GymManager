@@ -3,6 +3,7 @@ import Axios from "axios"
 import Scheduler from "@aldabil/react-scheduler"
 import JNotification from "../component/jNotification"
 import {Button} from "@mui/material"
+import {Badge} from "evergreen-ui";
 
 const EventColours = {
     "INITIAL": "#7149C6",
@@ -14,18 +15,16 @@ const EventColours = {
 function EventPopup(f, event, userInfo, fn) {
     const fields = {
         "Coach": { value: event.coach, renderType: "span", svg: "../person.svg"},
-        "Status": { value: event.status, renderType: "span", svg: "../status.svg"},
+        "Status": { value: (<Badge color={event.status === "ACTIVE" ? "green" : "red"}>{event.status}</Badge>), renderType: "span", svg: "../status.svg"},
         "Slots": { value: (event.registeredSlots || 0) + " / " + event.availableSlots, renderType: "span", svg: "../group.svg"},
         "Description": { value: event.description, renderType: "text", svg: "../text.svg"}
-    }
-
-    let action = ""
+    };
+    let action = "";
     if (userInfo.role === "COACH") {
-        action = !event.published ? "PUBLISH" : (event.status === "ACTIVE" ? "CANCEL" : "ACTIVATE")
+        action = !event.published ? "PUBLISH" : (event.status === "ACTIVE" ? "CANCEL" : "ACTIVATE");
     } else {
-        action = event.isRegistered ? "DEREGISTER" : "REGISTER"
+        action = event.isRegistered ? "DEREGISTER" : "REGISTER";
     }
-
     return (
         <div>
             {
@@ -59,7 +58,7 @@ function EventPopup(f, event, userInfo, fn) {
                 ))
             }
             {
-                action === "" || (event.status === "CANCELLED" && userInfo.role !== "COACH")
+                action === "" || (event.status === "CANCELLED" && userInfo.role !== "COACH" && action !== "DEREGISTER") || event.start < Date.now()
                     ? null
                     : (
                         <button
@@ -69,82 +68,93 @@ function EventPopup(f, event, userInfo, fn) {
                     )
             }
         </div>
-    )
+    );
 }
 
 function CustomSpan(props) {
-    const { children } = props
+    const { children } = props;
     return (
         <span className="MuiTypography-root MuiTypography-caption MuiTypography-noWrap css-49fffr" style={{
             width: "100%"
         }}>
             {children}
         </span>
-    )
+    );
 }
 
 export function MyCourses(props) {
-    const cal = useRef(null)
-    const courses = useRef([])
-    const [coaches, setCoaches] = useState([])
+    const cal = useRef(null);
+    const courses = useRef([]);
+    const [coaches, setCoaches] = useState([]);
 
     async function fetchData() {
         try {
-            Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "")
-            const res = await Axios.get("/api/v1/course/getCourses")
-            const status = res.data.status
+            Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
+            const res = await Axios.get("/api/v1/course/getCourses");
+            const status = res.data.status;
             if (status === 200) {
-                const data = res.data.data
-                buildData(data)
+                const data = res.data.data;
+                buildData(data);
             }
         } catch (err) {
-            JNotification.danger(err.response.data.message)
+            JNotification.danger(err.response.data.message);
         }
     }
 
     async function fetchCoaches() {
         try {
-            Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "")
-            const res = await Axios.get("/api/v1/user/getCoaches")
-            const status = res.data.status
+            Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
+            const res = await Axios.get("/api/v1/user/getCoaches");
+            const status = res.data.status;
             if (status === 200) {
-                const data = res.data.data
+                const data = res.data.data;
                 let result = data.map(x => { return {
                     id: x.id,
                     username: x.username
-                }})
-                setCoaches(result)
+                }});
+                setCoaches(result);
             }
         } catch (err) {
-            JNotification.danger(err.response.data.message)
+            JNotification.danger(err.response.data.message);
         }
     }
 
     useEffect(() => {
-        fetchData()
-        buildFields()
+        fetchData();
+        buildFields();
+        let isTrainee = props.userInfo.role === "TRAINEE";
         if (props.userInfo.role === "TRAINEE") {
-            fetchCoaches()
-            cal.current.scheduler.week.cellRenderer = ({ height, start, onClick, ...props }) => (<Button disableRipple={true}></Button>)
-        } else {
-            delete cal.current.scheduler.week.cellRenderer
+            fetchCoaches();
         }
-    },[])
+        cal.current.scheduler.week.cellRenderer = ({ height, start, onClick, ...props }) => {
+            let disabled = start <= Date.now();;
+            return (
+                <Button
+                    style={{
+                        backgroundColor: disabled ? "#f9f9f9" : "white"
+                    }}
+                    onClick={onClick}
+                    disabled={disabled || isTrainee}
+                    disableRipple={isTrainee}
+                />
+            );
+        }
+    },[]);
 
 
     function buildData(data) {
-        buildCourses(data)
+        buildCourses(data);
     }
 
     function buildCourses(data) {
-        let result = getCoursesFromData(data, true)
-        cal.current.scheduler.handleState(result, "events")
-        courses.current = result
+        let result = getCoursesFromData(data, true);
+        cal.current.scheduler.handleState(result, "events");
+        courses.current = result;
     }
 
     function getCoursesFromData(data, isRegistered) {
-        let isReadOnly = props.userInfo.role === "TRAINEE"
-        isRegistered = props.userInfo.role === "COACH" ? false : isRegistered
+        let isReadOnly = props.userInfo.role === "TRAINEE";
+        isRegistered = props.userInfo.role === "COACH" ? false : isRegistered;
         return data.map(x => {
             return {
                 event_id: x.id,
@@ -164,43 +174,43 @@ export function MyCourses(props) {
                 isRegistered: isRegistered,
                 color: getEventColor(x, isRegistered)
             }
-        })
+        });
     }
 
     function getEventColor(event, isRegistered) {
         if (event.status === "CANCELLED")
-            return EventColours["CANCELLED"]
+            return EventColours["CANCELLED"];
         if (isRegistered)
-            return EventColours["REGISTERED"]
+            return EventColours["REGISTERED"];
         if (event.published)
-            return EventColours["ACTIVE"]
-        return EventColours["INITIAL"]
+            return EventColours["ACTIVE"];
+        return EventColours["INITIAL"];
     }
 
     async function getCoachCourse(id) {
         if (id === "") {
-            await fetchData()
-            return
+            await fetchData();
+            return;
         }
-        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "")
+        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
         await Axios.get("/api/v1/course/getCourse/" + id)
             .then(res => {
                 if (res.status === 200) {
-                    let data = getCoursesFromData(res.data.data, false)
-                    const tempSet = new Set()
-                    const result = []
+                    let data = getCoursesFromData(res.data.data, false);
+                    const tempSet = new Set();
+                    const result = [];
                     courses.current.forEach((course, _) => {
-                        tempSet.add(course.event_id)
-                        result.push(course)
-                    })
+                        tempSet.add(course.event_id);
+                        result.push(course);
+                    });
                     data.forEach((course, _) => {
-                        if (!tempSet.has(course.event_id)) result.push(course)
-                    })
-                    cal.current.scheduler.handleState(result, "events")
+                        if (!tempSet.has(course.event_id)) result.push(course);
+                    });
+                    cal.current.scheduler.handleState(result, "events");
                 }
             })
             .catch(error => {
-                JNotification.danger("Failed to Load Course")
+                JNotification.danger("Failed to Load Course");
             })
     }
 
@@ -227,24 +237,24 @@ export function MyCourses(props) {
                 default: "Course Description...",
                 config: { label: "Details", multiline: true, rows: 4 }
             }
-        ]
-        cal.current.scheduler.handleState(res, "fields")
+        ];
+        cal.current.scheduler.handleState(res, "fields");
     }
 
     async function handleConfirm(e, action) {
-        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "")
-        const query = new FormData()
-        query.append("startTime", e.start.getTime())
-        query.append("endTime", e.end.getTime())
-        query.append("availableSlots", e.availableSlots)
-        query.append("registeredSlots", e.registeredSlots || 0)
-        query.append("title", e.title)
-        query.append("description", e.description)
-        query.append("status", e.status)
-        let url = action === "create" ? "/api/v1/course/createCourse" : "/api/v1/course/editCourse"
-        let method = action === "create" ? "post" : "put"
+        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
+        const query = new FormData();
+        query.append("startTime", e.start.getTime());
+        query.append("endTime", e.end.getTime());
+        query.append("availableSlots", e.availableSlots);
+        query.append("registeredSlots", e.registeredSlots || 0);
+        query.append("title", e.title);
+        query.append("description", e.description);
+        query.append("status", e.status);
+        let url = action === "create" ? "/api/v1/course/createCourse" : "/api/v1/course/editCourse";
+        let method = action === "create" ? "post" : "put";
         if (action === "edit") {
-            query.append("id", e.event_id)
+            query.append("id", e.event_id);
         }
         await Axios({
             method: method,
@@ -255,37 +265,37 @@ export function MyCourses(props) {
             }
         }).then(res => {
             if (res.status === 200) {
-                JNotification.success("Successfully " + action)
-                e = getCoursesFromData([res.data.data], false)[0]
+                JNotification.success("Successfully " + action);
+                e = getCoursesFromData([res.data.data], false)[0];
             }
         }).catch(error => {
-            JNotification.danger("Failed to " + action)
-            throw new Error("Failed to " + action)
-        })
-        return e
+            JNotification.danger("Failed to " + action);
+            throw new Error("Failed to " + action);
+        });
+        return e;
     }
 
     async function handleDelete(id) {
-        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "")
+        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
         await Axios.delete("/api/v1/course/deleteCourse/" + id
         ).then(res => {
             if (res.status === 200) {
-                JNotification.success("Successfully Deleted")
+                JNotification.success("Successfully Deleted");
             } else {
-                throw new Error("Failed to Delete")
+                throw new Error("Failed to Delete");
             }
         }).catch(error => {
-            JNotification.danger("Failed to Delete")
-            throw new Error("Failed to Delete")
+            JNotification.danger("Failed to Delete");
+            throw new Error("Failed to Delete");
         })
-        return id
+        return id;
     }
 
     async function handlePopupButton(event, action) {
-        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "")
-        let query = new FormData()
-        query.append("action", action.toLowerCase())
-        query.append("id", event.event_id)
+        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
+        let query = new FormData();
+        query.append("action", action.toLowerCase());
+        query.append("id", event.event_id);
         await Axios({
             method: "post",
             url: "/api/v1/course/actionCourse",
@@ -295,34 +305,34 @@ export function MyCourses(props) {
             }
         }).then(res => {
             if (res.status === 200) {
-                JNotification.success("Successfully " + action)
-                let event = getCoursesFromData([res.data.data], action === "REGISTER")[0]
-                cal.current.scheduler.confirmEvent(event, "edit")
+                JNotification.success("Successfully " + action);
+                let event = getCoursesFromData([res.data.data], action === "REGISTER")[0];
+                cal.current.scheduler.confirmEvent(event, "edit");
                 if (props.userInfo.role === "TRAINEE") {
                     if (action === "DEREGISTER") {
-                        courses.current = courses.current.filter(t => t.event_id !== event.event_id)
-                        let currentCoachId = document.querySelector("#coachSelector").value
+                        courses.current = courses.current.filter(t => t.event_id !== event.event_id);
+                        let currentCoachId = document.querySelector("#coachSelector").value;
                         if (event.coachId.toString() !== currentCoachId) {
-                            let updatedEvents = cal.current.scheduler.events.filter(t => t.event_id !== event.event_id)
-                            cal.current.scheduler.handleState(updatedEvents, "events")
+                            let updatedEvents = cal.current.scheduler.events.filter(t => t.event_id !== event.event_id);
+                            cal.current.scheduler.handleState(updatedEvents, "events");
                         }
                     } else {
-                        courses.current.push(event)
+                        courses.current.push(event);
                     }
                 }
             }
         }).catch(error => {
             JNotification.danger("Failed to " + action)
             throw new Error("Failed to " + action)
-        })
-        closeView()
+        });
+        closeView();
     }
 
     function closeView() {
-        const icon = document.querySelector('[data-testid="ClearRoundedIcon"]')
+        const icon = document.querySelector('[data-testid="ClearRoundedIcon"]');
         if (icon != null) {
-            const button = icon.parentNode;
-            if (button != null) button.click()
+            const button = icon.parentNode;;
+            if (button != null) button.click();
         }
     }
 
@@ -364,5 +374,5 @@ export function MyCourses(props) {
                 viewerExtraComponent={(f, e) => EventPopup(f, e, props.userInfo, handlePopupButton)}
             />
         </div>
-    )
+    );
 }
