@@ -100,10 +100,12 @@ export function MyInfo(props) {
                     {
                         !showChangePasswordForm
                             ? (
-                                <button
-                                    onClick={() => setShowChangePasswordForm(true)}
-                                    className="login-register-button-primary"
-                                >Change Password</button>
+                                // TODO: disabled
+                                // <button
+                                //     onClick={() => setShowChangePasswordForm(true)}
+                                //     className="login-register-button-primary"
+                                // >Change Password</button>
+                                <div></div>
                             )
                             : (
                                 <div>
