@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import Axios from "axios";
-import {Avatar} from "evergreen-ui";
+import {Avatar, Badge} from "evergreen-ui";
 import JNotification from "../component/jNotification";
 
 export function MyInfo(props) {
@@ -21,7 +21,6 @@ export function MyInfo(props) {
             }
         } catch (err) {
             JNotification.danger(err.response.data.message);
-            // history.goBack();
         }
     }
 
@@ -29,7 +28,7 @@ export function MyInfo(props) {
         fetchUserData();
     },[])
 
-    // TODO: Disabled temporarily
+    // TODO: Disabled Temporarily
     function handleChangePassword() {
         if (oldPassword === "" || newPassword === "" || confirmPassword === "") {
             JNotification.danger("Please enter valid password.");
@@ -91,7 +90,9 @@ export function MyInfo(props) {
                 <br/>
                 <label>{info.username}</label>
                 <br/>
-                <label>Joined: {new Date(info["registerTime"]).toLocaleString().split(",")[0]}</label>
+                <Badge color={info.role === "COACH" ? "yellow" : "green"}>{info.role}</Badge>
+                <br/>
+                <label style={{fontSize: "15px"}}>Member Since: {new Date(info["registerTime"]).toLocaleString().split(",")[0]}</label>
                 <hr style={{borderTop: "1px solid #EDF0F2"}} />
                 <div style={{
                     width: "50%",
@@ -100,7 +101,7 @@ export function MyInfo(props) {
                     {
                         !showChangePasswordForm
                             ? (
-                                // TODO: disabled
+                                // TODO: Disabled Temporarily
                                 // <button
                                 //     onClick={() => setShowChangePasswordForm(true)}
                                 //     className="login-register-button-primary"

@@ -179,3 +179,26 @@ div:has(> #coachSelector) {
     font-size: 14px;
     text-align-last: center;
 }
+
+.event-element {
+    margin: 0 0;
+    font-family: Roboto, Helvetica, Arial, sans-serif;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.event-title {
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 1.57;
+    letter-spacing: 0.00714em;
+}
+
+.event-text {
+    font-weight: 400;
+    font-size: 11px;
+    line-height: 1.5;
+    letter-spacing: 0.00938em;
+}
