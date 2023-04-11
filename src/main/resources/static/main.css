@@ -163,3 +163,19 @@ textarea, select, input, button { outline: none; }
 [data-testid="rs-wrapper"] {
     z-index: 5;
 }
+
+div[data-evergreen-toaster-container] > span {
+    z-index: 2000 !important;
+}
+
+div:has(> #coachSelector) {
+    left: calc(50% - 100px);
+    margin-top: 2px;
+    position: absolute;
+    z-index: 10;
+}
+
+#coachSelector {
+    font-size: 14px;
+    text-align-last: center;
+}

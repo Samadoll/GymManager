@@ -3,83 +3,14 @@ import Axios from "axios"
 import Scheduler from "@aldabil/react-scheduler"
 import JNotification from "../component/jNotification"
 import {Button} from "@mui/material"
-import {Badge} from "evergreen-ui";
+import {Select} from "evergreen-ui";
+import {EventPopup} from "../component/calendarEventPopup";
 
 const EventColours = {
-    "INITIAL": "#7149C6",
+    "INITIAL": "#6C62B1",
     "ACTIVE": "#FE6244",
     "CANCELLED": "#FC2947",
-    "REGISTERED": "#FFDEB9"
-}
-
-function EventPopup(f, event, userInfo, fn) {
-    const fields = {
-        "Coach": { value: event.coach, renderType: "span", svg: "../person.svg"},
-        "Status": { value: (<Badge color={event.status === "ACTIVE" ? "green" : "red"}>{event.status}</Badge>), renderType: "span", svg: "../status.svg"},
-        "Slots": { value: (event.registeredSlots || 0) + " / " + event.availableSlots, renderType: "span", svg: "../group.svg"},
-        "Description": { value: event.description, renderType: "text", svg: "../text.svg"}
-    };
-    let action = "";
-    if (userInfo.role === "COACH") {
-        action = !event.published ? "PUBLISH" : (event.status === "ACTIVE" ? "CANCEL" : "ACTIVATE");
-    } else {
-        action = event.isRegistered ? "DEREGISTER" : "REGISTER";
-    }
-    return (
-        <div>
-            {
-                Object.keys(fields).map((field, index) => (
-                    <div style={{minHeight: "24px"}}>
-                        {
-                            fields[field].renderType === "span"
-                                ? (
-                                    <CustomSpan key={index} >
-                                        <img src={fields[field].svg}
-                                             width={"20px"}
-                                             height={"20px"}
-                                             style={{ verticalAlign: "middle", marginLeft: "2px", marginRight: "10px"}}/>
-                                        {fields[field].value}
-                                    </CustomSpan>
-                                )
-                                : (
-                                    <CustomSpan key={index} >
-                                        <img src={fields[field].svg}
-                                             width={"20px"}
-                                             height={"20px"}
-                                             style={{ verticalAlign: "top", marginLeft: "2px", marginRight: "10px"}}
-                                        />
-                                        <textarea readOnly={true} style={{width: "340px", resize: "none", border: "1px solid #ccc"}} rows={4}>
-                                            {fields[field].value}
-                                        </textarea>
-                                    </CustomSpan>
-                                )
-                        }
-                    </div>
-                ))
-            }
-            {
-                action === "" || (event.status === "CANCELLED" && userInfo.role !== "COACH" && action !== "DEREGISTER") || event.start < Date.now()
-                    ? null
-                    : (
-                        <button
-                            onClick={() => { fn.apply(null, [event, action]) }}
-                            className="login-register-button-primary"
-                        >{action}</button>
-                    )
-            }
-        </div>
-    );
-}
-
-function CustomSpan(props) {
-    const { children } = props;
-    return (
-        <span className="MuiTypography-root MuiTypography-caption MuiTypography-noWrap css-49fffr" style={{
-            width: "100%"
-        }}>
-            {children}
-        </span>
-    );
+    "REGISTERED": "#33BA77"
 }
 
 export function MyCourses(props) {
@@ -242,6 +173,10 @@ export function MyCourses(props) {
     }
 
     async function handleConfirm(e, action) {
+        if (e.start.getTime() <= Date.now() || e.end.getTime() <= Date.now()) {
+            JNotification.danger("Cannot Create/Edit a Course for the Past Day")
+            throw new Error("Failed to " + action);
+        }
         Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
         const query = new FormData();
         query.append("startTime", e.start.getTime());
@@ -331,7 +266,7 @@ export function MyCourses(props) {
     function closeView() {
         const icon = document.querySelector('[data-testid="ClearRoundedIcon"]');
         if (icon != null) {
-            const button = icon.parentNode;;
+            const button = icon.parentNode;
             if (button != null) button.click();
         }
     }
@@ -342,7 +277,8 @@ export function MyCourses(props) {
                 coaches.length <= 0
                     ? null
                     : (
-                        <select
+                        <Select
+                            width={200}
                             id={"coachSelector"}
                             onChange={e => getCoachCourse(e.target.value)}
                         >
@@ -352,17 +288,13 @@ export function MyCourses(props) {
                                     <option
                                         key={index}
                                         value={coach.id}
-                                        label={coach.username}
+                                        label={"Coach: " + coach.username}
                                     />
                                 )
                             }
-                        </select>
+                        </Select>
                     )
             }
-            <button onClick={() => {
-                console.log(cal.current.scheduler)
-                console.log(document.querySelector("#coachSelector").value)
-            }}>Test</button>
             <Scheduler
                 ref={cal}
                 view="week"
