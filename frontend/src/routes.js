@@ -5,6 +5,7 @@ import { Register } from "./page/register";
 import { Header } from "./component/header";
 import Axios from "axios";
 import { Spinner } from "evergreen-ui";
+import { Home } from "./page/home"
 import { About } from "./page/about";
 import { MyInfo } from "./page/myInfo";
 import { MyCourses } from "./page/courses";
@@ -82,7 +83,7 @@ export function Routex() {
                         : (
                             <Routes>
                                 <Route exact path="/" element={
-                                    isLoggedIn ? (<MyInfo isLoggedIn={isLoggedIn} userInfo={userInfo} logout={logout} />) : (<About />)
+                                    isLoggedIn ? (<MyInfo isLoggedIn={isLoggedIn} userInfo={userInfo} logout={logout} />) : (<Home />)
                                 }/>
                                 <Route exact path="/myCourses" element={
                                     isLoggedIn ? (<MyCourses userInfo={userInfo} />) : (<About />)

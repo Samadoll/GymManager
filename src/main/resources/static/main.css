@@ -190,7 +190,7 @@ div:has(> #coachSelector) {
 }
 
 .event-title {
-    font-weight: 500;
+    font-weight: 600;
     font-size: 12px;
     line-height: 1.57;
     letter-spacing: 0.00714em;
@@ -201,4 +201,38 @@ div:has(> #coachSelector) {
     font-size: 11px;
     line-height: 1.5;
     letter-spacing: 0.00938em;
+}
+
+.event-panel {
+    height: auto;
+    text-align: center;
+    font-family: Roboto, Helvetica, Arial, sans-serif;
+    width: 80%;
+    margin: auto;
+}
+
+.event-panel-element {
+    padding: 2px 6px;
+    border-radius: 5px;
+    border: 1px solid #CCC;
+    width: 40%;
+    background-color: #F4FCF4;
+    margin: 2px auto;
+}
+
+.event-panel-element > button {
+    display: none;
+    background-color: steelblue;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    width: 100%;
+    height: auto;
+    margin: auto;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.event-panel-element:hover > button {
+    display: block;
 }

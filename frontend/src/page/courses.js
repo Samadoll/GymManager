@@ -5,13 +5,7 @@ import JNotification from "../component/jNotification"
 import {Button} from "@mui/material"
 import {Badge, Select} from "evergreen-ui";
 import {EventPopup} from "../component/calendarEventPopup";
-
-const EventColours = {
-    "INITIAL": "#6C62B1",
-    "ACTIVE": "#FE6244",
-    "CANCELLED": "#FC2947",
-    "REGISTERED": "#33BA77"
-}
+import {EventColours} from "../component/eventColours";
 
 function eventRenderer(event, role) {
     if (role === "COACH") return null;
@@ -319,6 +313,7 @@ export function MyCourses(props) {
                 view="week"
                 day={null}
                 month={null}
+                week={{weekStartOn: 1}}
                 onConfirm={(e, action) => handleConfirm(e, action)}
                 onEventDrop={(d, u, o) => handleConfirm(u, "edit")}
                 onDelete={handleDelete}

@@ -37,7 +37,7 @@ export function Login(props) {
         <div className="login-register-page">
             <div className="login-register-content">
                 <div style={{textAlign: "center", fontFamily: "Verdana", fontSize: "30px"}}>
-                    <label>Sign in to Gym Manager</label>
+                    <label>Sign in to FITNESS</label>
                 </div>
                 <hr/>
                 <br/>
