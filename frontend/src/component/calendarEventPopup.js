@@ -16,7 +16,7 @@ export function EventPopup(f, event, userInfo, fn) {
     const fields = {
         "Coach": { value: event.coach, renderType: "span", svg: "../person.svg"},
         "Status": { value: (<Badge color={event.status === "ACTIVE" ? "green" : "red"}>{event.status}</Badge>), renderType: "span", svg: "../status.svg"},
-        "Slots": { value: (event.registeredSlots || 0) + " / " + event.availableSlots, renderType: "span", svg: "../group.svg"},
+        "Slots": { value: event.registeredSlots === event.availableSlots ? (<Badge color={"red"}>FULL</Badge>) : (event.registeredSlots || 0) + " / " + event.availableSlots, renderType: "span", svg: "../group.svg"},
         "Description": { value: event.description, renderType: "text", svg: "../text.svg"}
     };
     let action = "";

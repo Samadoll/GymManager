@@ -27,6 +27,11 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getCoachCourse(Util.getCurrentUid(), id));
     }
 
+    @GetMapping("/getTodayCourses")
+    public ResponseEntity<JResponse> getTodayCourses() {
+        return ResponseEntity.ok(courseService.getTodayCourses(Util.getCurrentUid()));
+    }
+
     @PostMapping("/createCourse")
     public ResponseEntity<JResponse> createCourse(@RequestBody CourseEvent courseEvent) {
         return ResponseEntity.ok(courseService.createEditCourse(Util.getCurrentUid(), courseEvent));

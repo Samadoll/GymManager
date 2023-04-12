@@ -7,6 +7,9 @@ import com.jw.gymmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,26 +25,41 @@ public class CourseService {
         var user = userRepository.findById(currentUid);
         if (user.isEmpty())
             return JResponse.builder().status(400).message("User Not Exist").build();
-        var existedUser = user.get();
-        Optional<List<CourseEvent>> courses;
-        if (existedUser.getRole() == Role.COACH) {
-            courses = courseRepository.findCourseEventsByOwner(existedUser);
+        return JResponse.builder().status(200).data(getCourses(user.get())).build();
+    }
+
+    public JResponse getTodayCourses(int currentUid) {
+        var user = userRepository.findById(currentUid);
+        if (user.isEmpty())
+            return JResponse.builder().status(400).message("User Not Exist").build();
+        var now = new Date().getTime();
+        var endOfDay = Date.from(LocalDate.now().plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant()).getTime();
+
+        var courses = getCourses(user.get())
+                .stream()
+                .filter(t -> t.getEndTime() > now && t.getEndTime() < endOfDay && t.isPublished())
+                .sorted(Comparator.comparingLong(CourseEvent::getStartTime))
+                .collect(Collectors.toList());
+        return JResponse.builder().status(200).data(courses).build();
+    }
+
+    private List<CourseEvent> getCourses(User user) {
+        Optional<List<CourseEvent>> courses = Optional.empty();
+        if (user.getRole() == Role.COACH) {
+            courses = courseRepository.findCourseEventsByOwner(user);
         } else {
-            var registrations = registrationRepository.findCourseRegistrationsByTrainee(existedUser);
-            if (registrations.isEmpty()) {
-                return JResponse.builder().status(200).data(new ArrayList<>()).build();
+            var registrations = registrationRepository.findCourseRegistrationsByTrainee(user);
+            if (registrations.isPresent()) {
+                courses = courseRepository.findCourseEventsByCourseRegistrationsIn(registrations.get());
             }
-            courses = courseRepository.findCourseEventsByCourseRegistrationsIn(registrations.get());
         }
-        return JResponse.builder().status(200).data(courses.isPresent() ? courses.get() : new ArrayList<>()).build();
+        return courses.orElseGet(ArrayList::new);
     }
 
     public JResponse getCoachCourse(int currentUserId, int id) {
         var u = userRepository.findById(currentUserId);
         if (u.isEmpty())
             return JResponse.builder().status(400).message("User Not Exist").build();
-        var currentUser = u.get();
-
         var user = userRepository.findById(id);
         if (user.isEmpty())
             return JResponse.builder().status(400).message("Coach Not Exist").build();

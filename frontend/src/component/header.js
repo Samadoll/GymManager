@@ -68,7 +68,7 @@ function HeaderButtonGroup(props) {
 export function Header(props) {
     const pages = [
         {name: "Home", href: "#/", loginRequired: false},
-        {name: "My Courses", href: "#/myCourses", loginRequired: true},
+        {name: "Courses", href: "#/myCourses", loginRequired: true},
         {name: "About", href: "#/about", loginRequired: false}
     ];
     return (
@@ -83,6 +83,7 @@ export function Header(props) {
                         </div>
                     )
             }
+            <img src={"../logo.png"} style={{height: "55px", left: "calc(50% - 55px)", position: "fixed"}}/>
             <HeaderButtonGroup {...props} />
         </div>
     )

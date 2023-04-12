@@ -3,14 +3,27 @@ import Axios from "axios"
 import Scheduler from "@aldabil/react-scheduler"
 import JNotification from "../component/jNotification"
 import {Button} from "@mui/material"
-import {Select} from "evergreen-ui";
+import {Badge, Select} from "evergreen-ui";
 import {EventPopup} from "../component/calendarEventPopup";
+import {EventColours} from "../component/eventColours";
 
-const EventColours = {
-    "INITIAL": "#6C62B1",
-    "ACTIVE": "#FE6244",
-    "CANCELLED": "#FC2947",
-    "REGISTERED": "#33BA77"
+function eventRenderer(event, role) {
+    if (role === "COACH") return null;
+    let start = event.start.toLocaleTimeString(undefined, { timeStyle: "short" });
+    let end = event.end.toLocaleTimeString(undefined, { timeStyle: "short" });
+    return (
+        <div style={{padding: "2px 6px"}}>
+            <h6 className={"event-element event-title"}>{event.title}</h6>
+            <p className={"event-element event-text"}>{start} - {end}</p>
+            <p className={"event-element event-text"}>{event.coach}</p>
+            {event.isRegistered
+                ? (<div style={{textAlign: "center"}}>
+                    <Badge color={"green"} style={{fontSize: "10px", height: "12px", lineHeight: "11px", width: "100%"}}>Registered</Badge>
+                </div>)
+                : null
+            }
+        </div>
+    );
 }
 
 export function MyCourses(props) {
@@ -300,10 +313,12 @@ export function MyCourses(props) {
                 view="week"
                 day={null}
                 month={null}
+                week={{weekStartOn: 1}}
                 onConfirm={(e, action) => handleConfirm(e, action)}
                 onEventDrop={(d, u, o) => handleConfirm(u, "edit")}
                 onDelete={handleDelete}
                 viewerExtraComponent={(f, e) => EventPopup(f, e, props.userInfo, handlePopupButton)}
+                eventRenderer={(e) => eventRenderer(e, props.userInfo.role)}
             />
         </div>
     );
