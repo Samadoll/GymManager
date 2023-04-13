@@ -21,10 +21,6 @@ function HeaderButtonGroup(props) {
                     position={Position.BOTTOM_LEFT}
                     content={
                         <Menu>
-                            {/*<Menu.Group>*/}
-                            {/*    <Menu.Item icon="person" onSelect={() => navigate("/myAccount")}>My Account</Menu.Item>*/}
-                            {/*</Menu.Group>*/}
-                            {/*<Menu.Divider />*/}
                             <Menu.Group>
                                 <Menu.Item
                                     icon="key"
