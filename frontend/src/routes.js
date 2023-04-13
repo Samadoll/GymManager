@@ -86,7 +86,7 @@ export function Routex() {
                                     isLoggedIn ? (<MyInfo isLoggedIn={isLoggedIn} userInfo={userInfo} logout={logout} />) : (<Home />)
                                 }/>
                                 <Route exact path="/myCourses" element={
-                                    isLoggedIn ? (<MyCourses userInfo={userInfo} />) : (<About />)
+                                    isLoggedIn ? (<MyCourses userInfo={userInfo} />) : (<Navigate to="/" />)
                                 }/>
                                 <Route path="/loginPage" element={
                                     isLoggedIn ? (<Navigate to="/" />) : (<Login login={login} />)

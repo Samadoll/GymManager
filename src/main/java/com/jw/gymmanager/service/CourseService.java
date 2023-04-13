@@ -2,7 +2,7 @@ package com.jw.gymmanager.service;
 
 import com.jw.gymmanager.entity.*;
 import com.jw.gymmanager.repository.CourseRepository;
-import com.jw.gymmanager.repository.RegistrationRepository;
+import com.jw.gymmanager.repository.CourseRegistrationRepository;
 import com.jw.gymmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class CourseService {
 
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
-    private final RegistrationRepository registrationRepository;
+    private final CourseRegistrationRepository registrationRepository;
 
     public JResponse getCourses(int currentUid) {
         var user = userRepository.findById(currentUid);

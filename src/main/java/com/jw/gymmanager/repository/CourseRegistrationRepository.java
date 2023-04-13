@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 import java.util.Set;
 
-public interface RegistrationRepository extends JpaRepository<CourseRegistration, Integer> {
+public interface CourseRegistrationRepository extends JpaRepository<CourseRegistration, Integer> {
 
     Optional<Set<CourseRegistration>> findCourseRegistrationsByTrainee(User trainee);
     Optional<CourseRegistration> findCourseRegistrationByCourseAndTrainee(CourseEvent course, User trainee);
