@@ -79,7 +79,7 @@ export function Header(props) {
                         </div>
                     )
             }
-            <img src={"../logo.png"} style={{height: "55px", left: "calc(50% - 55px)", position: "fixed"}}/>
+            <img src={"../media/logo.png"} style={{height: "55px", left: "calc(50% - 55px)", position: "fixed"}}/>
             <HeaderButtonGroup {...props} />
         </div>
     )

@@ -11,7 +11,7 @@ export function Home() {
                 <label style={fontSettings}>TO</label>
             </div>
             <div>
-                <img src={"../logo.png"} style={{width: "70%"}}/>
+                <img src={"../media/logo.png"} style={{width: "70%"}}/>
             </div>
         </div>
     )
