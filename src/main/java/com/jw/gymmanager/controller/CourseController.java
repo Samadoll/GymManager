@@ -22,7 +22,7 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getCourses(Util.getCurrentUid()));
     }
 
-    @GetMapping("/getCourse/{id}")
+    @GetMapping("/getCoachCourses/{id}")
     public ResponseEntity<JResponse> getCourse(@PathVariable Integer id) {
         return ResponseEntity.ok(courseService.getCoachCourse(Util.getCurrentUid(), id));
     }

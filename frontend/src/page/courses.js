@@ -137,7 +137,7 @@ export function MyCourses(props) {
             return;
         }
         Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
-        await Axios.get("/api/v1/course/getCourse/" + id)
+        await Axios.get("/api/v1/course/getCoachCourses/" + id)
             .then(res => {
                 if (res.status === 200) {
                     let data = getCoursesFromData(res.data.data, false);
