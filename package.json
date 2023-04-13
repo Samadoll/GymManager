@@ -26,7 +26,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "watch": "webpack --watch -d --output ./target/classes/static/built/bundle.js",
-    "build-prod": "webpack --mode production --config ./webpack.prod.js"
+    "build-prod": "webpack --mode production --config ./webpack.prod.js",
+    "config": "npm install;npm run build-prod"
   },
   "eslintConfig": {
     "extends": [
