@@ -65,7 +65,7 @@ export function Header(props) {
     const pages = [
         {name: "Home", href: "#/", loginRequired: false},
         {name: "Courses", href: "#/myCourses", loginRequired: true},
-        {name: "About", href: "#/about", loginRequired: false}
+        // {name: "About", href: "#/about", loginRequired: false}
     ];
     return (
         <div id="header" className="sticky-header">

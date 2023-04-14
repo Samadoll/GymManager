@@ -17,6 +17,10 @@ export function Register() {
             JNotification.danger("Invalid Username (Alphanumeric only)");
             return;
         }
+        if (password.trim() === "") {
+            JNotification.danger("Password Cannot Be Empty");
+            return;
+        }
         if (confirm !== password) {
             JNotification.danger("Password Not Match");
             return;
