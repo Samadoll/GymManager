@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react"
 import Axios from "axios"
-import {Scheduler} from "@aldabil/react-scheduler"
+import Scheduler from "@aldabil/react-scheduler"
 import JNotification from "../component/jNotification"
 import {Button} from "@mui/material"
 import {Badge, Select} from "evergreen-ui";

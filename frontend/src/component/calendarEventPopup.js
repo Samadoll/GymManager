@@ -4,9 +4,7 @@ import {Badge} from "evergreen-ui";
 function CustomSpan(props) {
     const { children } = props;
     return (
-        <span className="MuiTypography-root MuiTypography-caption MuiTypography-noWrap css-49fffr" style={{
-            width: "100%"
-        }}>
+        <span className="event-popup">
             {children}
         </span>
     );

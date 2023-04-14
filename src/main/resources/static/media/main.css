@@ -236,3 +236,12 @@ div:has(> #coachSelector) {
 .event-panel-element:hover > button {
     display: block;
 }
+
+.event-popup {
+    font-family: "Roboto","Helvetica","Arial",sans-serif;
+    font-size: 14px;
+    width: 100%;
+    opacity: 0.6;
+    display: inline-flex;
+    align-items: center;
+}
