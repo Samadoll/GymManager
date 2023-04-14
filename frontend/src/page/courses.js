@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react"
 import Axios from "axios"
-import Scheduler from "@aldabil/react-scheduler"
+import {Scheduler} from "@aldabil/react-scheduler"
 import JNotification from "../component/jNotification"
 import {Button} from "@mui/material"
 import {Badge, Select} from "evergreen-ui";
@@ -285,41 +285,43 @@ export function MyCourses(props) {
     }
 
     return (
-        <div className="table-content">
-            {
-                coaches.length <= 0
-                    ? null
-                    : (
-                        <Select
-                            width={200}
-                            id={"coachSelector"}
-                            onChange={e => getCoachCourse(e.target.value)}
-                        >
-                            <option key={-1} label="My Courses"/>
-                            {
-                                coaches.map((coach, index) =>
-                                    <option
-                                        key={index}
-                                        value={coach.id}
-                                        label={"Coach: " + coach.username}
-                                    />
-                                )
-                            }
-                        </Select>
-                    )
-            }
-            <Scheduler
-                ref={cal}
-                view="week"
-                day={null}
-                month={null}
-                week={{weekStartOn: 1}}
-                onConfirm={(e, action) => handleConfirm(e, action)}
-                onEventDrop={(d, u, o) => handleConfirm(u, "edit")}
-                onDelete={handleDelete}
-                viewerExtraComponent={(f, e) => EventPopup(f, e, props.userInfo, handlePopupButton)}
-                eventRenderer={(e) => eventRenderer(e, props.userInfo.role)}
-            />
-        </div>
+        <>
+            <div className="table-content">
+                {
+                    coaches.length <= 0
+                        ? null
+                        : (
+                            <Select
+                                width={200}
+                                id={"coachSelector"}
+                                onChange={e => getCoachCourse(e.target.value)}
+                            >
+                                <option key={-1} label="My Courses"/>
+                                {
+                                    coaches.map((coach, index) =>
+                                        <option
+                                            key={index}
+                                            value={coach.id}
+                                            label={"Coach: " + coach.username}
+                                        />
+                                    )
+                                }
+                            </Select>
+                        )
+                }
+                <Scheduler
+                    ref={cal}
+                    view="week"
+                    day={null}
+                    month={null}
+                    week={{weekStartOn: 1}}
+                    onConfirm={(e, action) => handleConfirm(e, action)}
+                    onEventDrop={(d, u, o) => handleConfirm(u, "edit")}
+                    onDelete={handleDelete}
+                    viewerExtraComponent={(f, e) => EventPopup(f, e, props.userInfo, handlePopupButton)}
+                    eventRenderer={(e) => eventRenderer(e, props.userInfo.role)}
+                />
+            </div>
+        </>
     );
 }
