@@ -12,6 +12,10 @@ export function Login(props) {
         const query = new FormData();
         query.append("username", username);
         query.append("password", password);
+        if (username.trim() === "" || password.trim() === "") {
+            JNotification.danger("Please Enter Username and Password");
+            return;
+        }
         Axios.post("/api/v1/auth/authenticate", query, {
             headers: {
                 'Content-Type': 'application/json',
@@ -29,7 +33,7 @@ export function Login(props) {
                 }
             })
             .catch(error => {
-                JNotification.danger(error.response.data.message);
+                JNotification.danger("Invalid Username/Password");
             })
     }
 
@@ -55,8 +59,8 @@ export function Login(props) {
                     <br/>
                     <div>
                         <label className="input-field-label">Password:</label>
-                        <a className="input-field-label" href="/" tabIndex="-1"
-                           style={{float: "right", fontSize: "15px", marginTop: "5px"}}>Forgot Password?</a>
+                        {/*<a className="input-field-label" href="/" tabIndex="-1"*/}
+                        {/*   style={{float: "right", fontSize: "15px", marginTop: "5px"}}>Forgot Password?</a>*/}
                     </div>
                     <input
                         className="input-field"
