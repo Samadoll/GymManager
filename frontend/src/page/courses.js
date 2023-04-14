@@ -71,7 +71,7 @@ export function MyCourses(props) {
             fetchCoaches();
         }
         cal.current.scheduler.week.cellRenderer = ({ height, start, onClick, ...props }) => {
-            let disabled = start <= Date.now();;
+            let disabled = start <= Date.now();
             return (
                 <Button
                     style={{
@@ -161,15 +161,6 @@ export function MyCourses(props) {
     function buildFields() {
         let res = [
             {
-                name: "status",
-                type: "select",
-                options: [
-                    { id: 1, text: "Active", value: "ACTIVE" }
-                ],
-                default: "ACTIVE",
-                config: { label: "Status" }
-            },
-            {
                 name: "availableSlots",
                 type: "input",
                 default: 10,
@@ -186,6 +177,7 @@ export function MyCourses(props) {
     }
 
     async function handleConfirm(e, action) {
+        console.log(cal);
         if (e.start.getTime() <= Date.now() || e.end.getTime() <= Date.now()) {
             JNotification.danger("Cannot Create/Edit a Course for the Past Day")
             throw new Error("Failed to " + action);
@@ -198,7 +190,7 @@ export function MyCourses(props) {
         query.append("registeredSlots", e.registeredSlots || 0);
         query.append("title", e.title);
         query.append("description", e.description);
-        query.append("status", e.status);
+        query.append("status", "ACTIVE");
         let url = action === "create" ? "/api/v1/course/createCourse" : "/api/v1/course/editCourse";
         let method = action === "create" ? "post" : "put";
         if (action === "edit") {

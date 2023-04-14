@@ -7,7 +7,8 @@ function EventCard(props) {
     let start = new Date(props.event.startTime).toLocaleTimeString(undefined, { timeStyle: "short" });
     let end = new Date(props.event.endTime).toLocaleTimeString(undefined, { timeStyle: "short" });
     let badgeColour = props.event.status === "ACTIVE" ? "green" : "red";
-    let action = "DEREGISTER"
+    let readonly = new Date(props.event.startTime).getTime() < new Date().getTime();
+    let action = "DEREGISTER";
     if (props.userInfo.role === "COACH") {
         action = props.event.status === "ACTIVE" ? "CANCEL" : "ACTIVATE";
     }
@@ -17,7 +18,7 @@ function EventCard(props) {
             <p className={"event-element event-text"}>{start} - {end}</p>
             {props.userInfo.role === "COACH" ? null : (<p className={"event-element event-text"}>{props.event.owner.username}</p>)}
             <Badge color={badgeColour} style={{verticalAlign: "top"}}>{props.event.status}</Badge>
-            <button className="login-register-button-primary" onClick={() => { props.fn.apply(null, [props.event, action]); }}>{action}</button>
+            {readonly ? null : (<button className="login-register-button-primary" onClick={() => { props.fn.apply(null, [props.event, action]); }}>{action}</button>)}
         </div>
     )
 }
