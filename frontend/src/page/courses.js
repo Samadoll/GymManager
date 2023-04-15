@@ -72,6 +72,7 @@ export function MyCourses(props) {
         }
         cal.current.scheduler.week.cellRenderer = ({ height, start, onClick, ...props }) => {
             let disabled = start <= Date.now();
+            const restProps = disabled || isTrainee ? {} : props;
             return (
                 <Button
                     style={{
@@ -80,6 +81,7 @@ export function MyCourses(props) {
                     onClick={onClick}
                     disabled={disabled || isTrainee}
                     disableRipple={isTrainee}
+                    {...restProps}
                 />
             );
         }
