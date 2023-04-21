@@ -1,15 +1,12 @@
 import React from "react";
 import {useNavigate, useLocation} from "react-router-dom";
 import {Avatar, Menu, Popover, Position} from "evergreen-ui";
-import Axios from "axios";
 
 function HeaderButtonGroup(props) {
     const navigate = useNavigate();
     const location = useLocation();
 
     function handleLogOut() {
-        Axios.defaults.headers.Authorization = localStorage.getItem("Authorization");
-        // Axios.post("/api/v1/auth/logout"); TODO: used to evict authorization token
         props.logout();
         navigate("/")
     }

@@ -4,6 +4,7 @@ import com.jw.gymmanager.util.JwtUtil;
 import com.jw.gymmanager.util.Util;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +27,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        final String header = request.getHeader("Authorization");
-        if (header == null || !header.startsWith("Bearer ")) {
+        final String token = getJwt(request);
+        if (token == null) {
             filterChain.doFilter(request, response);
             return;
         }
-        final String token = header.split(" ")[1];
         final String username = JwtUtil.getUsername(token);
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -43,5 +43,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private String getJwt(@NonNull HttpServletRequest request) {
+        var cookies = request.getCookies();
+        if (cookies == null) {
+            return null;
+        }
+        String jwt = null;
+        for(Cookie cookie : cookies) {
+            if(cookie.getName().equals("jwt")) {
+                jwt = cookie.getValue();
+                break;
+            }
+        }
+        if (jwt == null || !jwt.startsWith("Bearer-")) {
+            return null;
+        }
+        return jwt.split("-", 2)[1].trim();
     }
 }

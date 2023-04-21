@@ -28,7 +28,6 @@ export function EventPanel(props) {
 
     async function fetchEvent() {
         try {
-            Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
             const res = await Axios.get(props.eventApi);
             const status = res.data.status;
             if (status === 200) {
@@ -41,7 +40,6 @@ export function EventPanel(props) {
     }
 
     async function handlePopupButton(event, action) {
-        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
         let query = new FormData();
         query.append("action", action.toLowerCase());
         query.append("id", event.id);

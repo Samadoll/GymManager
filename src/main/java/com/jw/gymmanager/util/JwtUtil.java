@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 public class JwtUtil {
 
-    private final static long EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000;
+    private final static long EXPIRE_TIME = 6 * 60 * 60 * 1000;
     private final static String SECRET_KEY = "70337336763979244226452948404D6351655468576D5A7134743777217A2543";
 
     public static String getUsername(String token) {

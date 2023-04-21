@@ -24,9 +24,8 @@ export function Routex() {
         setUserInfo(userInfo);
     }
 
-    function logout() {
-        localStorage.removeItem("Authorization");
-        delete Axios.defaults.headers.Authorization;
+    async function logout(flag=true) {
+        if (flag) await Axios.post("/api/v1/auth/logout")
         setUserInfo({
             username: "",
             uid: 0,
@@ -36,25 +35,21 @@ export function Routex() {
     }
 
     async function initialFetch() {
-        const token = localStorage.getItem("Authorization") || "";
-        if (token !== "") {
-            try {
-                Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
-                const res = await Axios.get("/api/v1/auth/checkAuth");
-                const status = res.status;
-                if (status === 200) {
-                    setUserInfo({
-                        username: res.data.username,
-                        uid: res.data.uid,
-                        role: res.data.role
-                    });
-                    setIsLoggedIn(true);
-                } else {
-                    logout();
-                }
-            } catch (e) {
-                logout();
+        try {
+            const res = await Axios.get("/api/v1/auth/checkAuth");
+            const status = res.status;
+            if (status === 200) {
+                setUserInfo({
+                    username: res.data.username,
+                    uid: res.data.uid,
+                    role: res.data.role
+                });
+                setIsLoggedIn(true);
+            } else {
+                logout(false);
             }
+        } catch (e) {
+            logout(false);
         }
         setIsLoading(false);
     }
