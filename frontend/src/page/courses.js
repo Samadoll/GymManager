@@ -176,7 +176,6 @@ export function MyCourses(props) {
     }
 
     async function handleConfirm(e, action) {
-        console.log(cal);
         if (e.start.getTime() <= Date.now() || e.end.getTime() <= Date.now()) {
             JNotification.danger("Cannot Create/Edit a Course for the Past Day")
             throw new Error("Failed to " + action);
