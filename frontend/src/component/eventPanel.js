@@ -16,12 +16,9 @@ function EventCard(props) {
         <div className={"event-panel-element"}>
             <h6 className={"event-element event-title"}>{props.event.title}</h6>
             <p className={"event-element event-text"}>{start} - {end}</p>
-            {props.userInfo.role === "COACH" ? null : (
-                <p className={"event-element event-text"}>{props.event.owner.username}</p>)}
+            {props.userInfo.role === "COACH" ? null : (<p className={"event-element event-text"}>{props.event.owner.username}</p>)}
             <Badge color={badgeColour} style={{verticalAlign: "top"}}>{props.event.status}</Badge>
-            {readonly ? null : (<button className="login-register-button-primary" onClick={() => {
-                props.fn.apply(null, [props.event, action]);
-            }}>{action}</button>)}
+            {readonly ? null : (<button className="login-register-button-primary" onClick={() => {props.fn.apply(null, [props.event, action]);}}>{action}</button>)}
         </div>
     )
 }
@@ -64,14 +61,9 @@ export function EventPanel(props) {
     }, [])
 
     return (
-        <div className={"event-panel"}>
+        <div className={"event-panel" + (events.length === 0 ? " event-panel-empty" : "")}>
             <CalendarIcon size={24} color={events.length === 0 ? "disabled" : "muted"}/>
-            <label style={{
-                color: events.length === 0 ? "#D8DAE5" : "#8F95B2",
-                fontSize: "20px",
-                verticalAlign: "top",
-                marginLeft: "10px"
-            }}>
+            <label className={"event-panel-title" + (events.length === 0 ? "-empty" : "")}>
                 {events.length === 0 ? "You don't have any courses today." : "Your Upcoming Courses Today"}
             </label>
             {

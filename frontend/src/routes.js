@@ -8,7 +8,7 @@ import { Home } from "./page/home"
 import { MyInfo } from "./page/myInfo";
 import { MyCourses } from "./page/courses";
 import JAxios from "./component/jAxios";
-// import { About } from "./page/about";
+import { About } from "./page/about";
 
 export function Routex() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -88,7 +88,7 @@ export function Routex() {
                                 <Route exact path="/registerPage" element={
                                     isLoggedIn ? (<Navigate to="/" />) : (<Register />)
                                 }/>
-                                {/*<Route exact path="/about" element={<About />} />*/}
+                                <Route exact path="/about" element={<About />} />
                             </Routes>
                         )
                 }

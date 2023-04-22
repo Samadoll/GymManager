@@ -211,7 +211,25 @@ div:has(> #coachSelector) {
     width: 63%;
     margin: auto;
     padding: 20px;
+}
+
+.event-panel-empty {
+    position: absolute;
+    top: 150px;
+}
+
+.event-panel-title {
+    color: #8F95B2;
+    font-size: 20px;
     vertical-align: top;
+    margin-left: 10px;
+}
+
+.event-panel-title-empty {
+    color: #D8DAE5;
+    font-size: 20px;
+    vertical-align: top;
+    margin-left: 10px;
 }
 
 .event-panel-element {
@@ -250,7 +268,6 @@ div:has(> #coachSelector) {
 }
 
 .info-panel {
-    vertical-align: top;
     min-height: 70vh;
     display: inline-block;
     height: auto;
@@ -260,6 +277,7 @@ div:has(> #coachSelector) {
     margin: 20px 0;
     width: 30%;
     font-size: 20px;
+    vertical-align: top;
 }
 
 .info-panel-field-label {
