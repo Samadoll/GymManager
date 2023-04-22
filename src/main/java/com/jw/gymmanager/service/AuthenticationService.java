@@ -40,8 +40,8 @@ public class AuthenticationService {
         return AuthenticationResponse.builder().token(JwtUtil.generateToken(user)).uid(user.getId()).role(user.getRole()).build();
     }
 
-    public AuthenticationResponse checkAuth(){
-        var principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public AuthenticationResponse checkAuth() {
+        if (!(SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof User principal)) return null;
         return AuthenticationResponse.builder()
                 .uid(principal.getId())
                 .username(principal.getUsername())

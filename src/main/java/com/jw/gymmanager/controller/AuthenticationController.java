@@ -4,7 +4,10 @@ import com.jw.gymmanager.entity.AuthenticationRequest;
 import com.jw.gymmanager.entity.AuthenticationResponse;
 import com.jw.gymmanager.entity.RegisterRequest;
 import com.jw.gymmanager.service.AuthenticationService;
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +17,18 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticationController {
 
     private final AuthenticationService service;
+
+    private String getCookie(String token) {
+        var emptyToken = token.isEmpty();
+        return ResponseCookie
+                .from("jwt", !emptyToken ? "Bearer-" + token : token)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(!emptyToken ? 6 * 60 * 60 : 0)
+                .build()
+                .toString();
+    }
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
@@ -25,11 +40,18 @@ public class AuthenticationController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
-        return ResponseEntity.ok(service.authenticate(request));
+        var response = service.authenticate(request);
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, getCookie(response.getToken())).body(response);
     }
 
     @GetMapping("/checkAuth")
     public ResponseEntity<AuthenticationResponse> checkAuth() {
-        return ResponseEntity.ok(service.checkAuth());
+        var response = service.checkAuth();
+        return response != null ? ResponseEntity.ok(response) : ResponseEntity.badRequest().build();
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, getCookie("")).build();
     }
 }

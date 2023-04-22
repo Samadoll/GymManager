@@ -13,7 +13,6 @@ export function MyInfo(props) {
 
     async function fetchUserData() {
         try {
-            Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
             const res = await Axios.get("/api/v1/user/getInfo");
             const status = res.data.status;
             if (status === 200) {
@@ -47,9 +46,6 @@ export function MyInfo(props) {
                 const data = res.data;
                 const status = data.status;
                 if (status === 200) {
-                    const token = data.data.token;
-                    localStorage.setItem("Authorization", token);
-                    Axios.defaults.headers.Authorization = token;
                     const query = new FormData();
                     query.append("password", newPassword);
                     Axios.put("/api/user/password", query)

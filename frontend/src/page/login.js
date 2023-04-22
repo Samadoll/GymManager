@@ -23,10 +23,7 @@ export function Login(props) {
             .then(res => {
                 const data = res.data;
                 if (res.status === 200) {
-                    const token = data.token;
                     const uid = data.uid;
-                    localStorage.setItem("Authorization", token);
-                    Axios.defaults.headers.Authorization = token;
                     props.login({ username: username, uid: uid, role: data.role });
                     navigate("/")
                     JNotification.success(`Welcome, ${username}!`);

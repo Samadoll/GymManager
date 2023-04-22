@@ -33,7 +33,6 @@ export function MyCourses(props) {
 
     async function fetchData() {
         try {
-            Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
             const res = await Axios.get("/api/v1/course/getCourses");
             const status = res.data.status;
             if (status === 200) {
@@ -47,7 +46,6 @@ export function MyCourses(props) {
 
     async function fetchCoaches() {
         try {
-            Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
             const res = await Axios.get("/api/v1/user/getCoaches");
             const status = res.data.status;
             if (status === 200) {
@@ -138,7 +136,6 @@ export function MyCourses(props) {
             await fetchData();
             return;
         }
-        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
         await Axios.get("/api/v1/course/getCoachCourses/" + id)
             .then(res => {
                 if (res.status === 200) {
@@ -179,12 +176,10 @@ export function MyCourses(props) {
     }
 
     async function handleConfirm(e, action) {
-        console.log(cal);
         if (e.start.getTime() <= Date.now() || e.end.getTime() <= Date.now()) {
             JNotification.danger("Cannot Create/Edit a Course for the Past Day")
             throw new Error("Failed to " + action);
         }
-        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
         const query = new FormData();
         query.append("startTime", e.start.getTime());
         query.append("endTime", e.end.getTime());
@@ -218,7 +213,6 @@ export function MyCourses(props) {
     }
 
     async function handleDelete(id) {
-        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
         await Axios.delete("/api/v1/course/deleteCourse/" + id
         ).then(res => {
             if (res.status === 200) {
@@ -234,7 +228,6 @@ export function MyCourses(props) {
     }
 
     async function handlePopupButton(event, action) {
-        Axios.defaults.headers.Authorization = "Bearer " + (localStorage.getItem("Authorization") || "");
         let query = new FormData();
         query.append("action", action.toLowerCase());
         query.append("id", event.event_id);
