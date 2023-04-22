@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from "react";
-import Axios from "axios";
 import {Avatar, Badge} from "evergreen-ui";
 import JNotification from "../component/jNotification";
 import {EventPanel} from "../component/eventPanel";
+import JAxios from "../component/jAxios";
 
 function PasswordInput(props) {
     return (
@@ -32,7 +32,7 @@ function InfoPanel(props) {
 
     async function fetchUserData() {
         try {
-            const res = await Axios.get("/api/v1/user/getInfo");
+            const res = await JAxios.get("/api/v1/user/getInfo");
             const status = res.data.status;
             if (status === 200) {
                 const data = res.data.data;
@@ -60,36 +60,26 @@ function InfoPanel(props) {
         const loginQuery = new FormData();
         loginQuery.append("username", info.username);
         loginQuery.append("password", oldPassword);
-        Axios({
-            method: "post",
-            url: "/api/v1/auth/authenticate",
-            data: loginQuery,
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(res => {
-            if (res.status === 200) {
-                const query = new FormData();
-                query.append("password", newPassword);
-                Axios({
-                    method: "put",
-                    url: "/api/v1/auth/password",
-                    data: query,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                }).then((res) => {
-                    if (res.status === 200) {
-                        JNotification.success("Password is changed. Please login.");
-                        props.logout();
-                    }
-                }).catch((err) => {
-                    JNotification.danger("Failed to Change Password");
-                })
-            }
-        }).catch(error => {
-            JNotification.danger("Failed to Change Password");
-        })
+        JAxios.post("/api/v1/auth/authenticate", loginQuery)
+            .then(res => {
+                if (res.status === 200) {
+                    const query = new FormData();
+                    query.append("password", newPassword);
+                    JAxios.put("/api/v1/auth/password", query)
+                        .then((res) => {
+                            if (res.status === 200) {
+                                JNotification.success("Password is changed. Please login.");
+                                props.logout();
+                            }
+                        })
+                        .catch((err) => {
+                            JNotification.danger("Failed to Change Password");
+                        })
+                }
+            })
+            .catch(error => {
+                JNotification.danger("Failed to Change Password");
+            })
     }
 
     return (
