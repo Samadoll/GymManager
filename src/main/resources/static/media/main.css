@@ -204,11 +204,14 @@ div:has(> #coachSelector) {
 }
 
 .event-panel {
+    display: inline-block;
     height: auto;
     text-align: center;
     font-family: Roboto, Helvetica, Arial, sans-serif;
-    width: 80%;
+    width: 63%;
     margin: auto;
+    padding: 20px;
+    vertical-align: top;
 }
 
 .event-panel-element {
@@ -247,11 +250,41 @@ div:has(> #coachSelector) {
 }
 
 .info-panel {
+    vertical-align: top;
+    min-height: 70vh;
+    display: inline-block;
     height: auto;
     text-align: center;
     font-family: Verdana, sans-serif;
-    padding: 20px;
+    padding: 0 20px 20px 20px;
+    margin: 20px 0;
     width: 30%;
     font-size: 20px;
-    min-height: 650px;
+}
+
+.info-panel-field-label {
+    font-size: 80% !important;
+}
+
+.info-panel-field {
+    font-size: 80% !important;
+    height: 30px !important;
+}
+
+.info-panel-button {
+    font-size: 15px;
+    height: 30px;
+}
+
+.info-panel-button:hover {
+    filter: brightness(95%);
+}
+
+.info-panel-divider {
+    position: absolute;
+    top: 20px;
+    bottom: 20px;
+    display: inline-block;
+    width: 0;
+    border: 1px solid #EDF0F2;;
 }

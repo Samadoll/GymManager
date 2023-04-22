@@ -8,10 +8,10 @@ function PasswordInput(props) {
     return (
         <>
             <div>
-                <label className="input-field-label">{props.name}:</label>
+                <label className="info-panel-field-label input-field-label">{props.name}:</label>
             </div>
             <input
-                className="input-field"
+                className="info-panel-field input-field"
                 maxLength="20"
                 required
                 placeholder={props.placeholder}
@@ -107,7 +107,7 @@ function InfoPanel(props) {
                         ? (
                             <button
                                 onClick={() => setShowChangePasswordForm(true)}
-                                className="login-register-button-primary"
+                                className="info-panel-button login-register-button-primary"
                             >Change Password</button>
                         )
                         : (
@@ -125,7 +125,7 @@ function InfoPanel(props) {
                                 <button
                                     style={{marginBottom: 10}}
                                     onClick={() => handleChangePassword()}
-                                    className="login-register-button-primary"
+                                    className="info-panel-button login-register-button-primary"
                                 >Submit
                                 </button>
                                 <button
@@ -135,7 +135,7 @@ function InfoPanel(props) {
                                         setNewPassword("");
                                         setConfirmPassword("");
                                     }}
-                                    className="login-register-button-secondary"
+                                    className="info-panel-button login-register-button-secondary"
                                 >Cancel
                                 </button>
                             </div>
@@ -148,8 +148,9 @@ function InfoPanel(props) {
 
 export function MyInfo(props) {
     return (
-        <div className="table-content">
+        <div className="table-content" style={{position: "relative"}}>
             <InfoPanel logout={props.logout}/>
+            <div className={"info-panel-divider"}></div>
             <EventPanel eventApi={"/api/v1/course/getTodayCourses"} userInfo={props.userInfo}/>
         </div>
     )

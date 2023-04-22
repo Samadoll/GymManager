@@ -55,7 +55,6 @@ public class AuthenticationService {
         if (existedUser == null) return false;
         existedUser.setPassword(new BCryptPasswordEncoder().encode(password));
         userRepository.save(existedUser);
-        var check = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(existedUser.getUsername(), password)).isAuthenticated();
-        return check;
+        return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(existedUser.getUsername(), password)).isAuthenticated();
     }
 }
