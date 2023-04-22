@@ -84,24 +84,17 @@ function InfoPanel(props) {
 
     return (
         <div className={"info-panel"}>
-            <Avatar
-                name={info.username}
-                size={100}
-                marginTop="5px"
-            />
+            <Avatar name={info.username} size={100} marginTop="5px"/>
             <br/>
             <label>{info.username}</label>
             <br/>
-            <Badge color={info.role === "COACH" ? "yellow" : "green"}
-                   style={{fontSize: "16px", height: "16px"}}>{info.role}</Badge>
+            <Badge color={info.role === "COACH" ? "yellow" : "green"} style={{fontSize: "16px", height: "16px"}}>{info.role}</Badge>
             <br/>
-            <label style={{fontSize: "15px"}}>Member
-                Since: {new Date(info["registerTime"]).toLocaleString().split(",")[0]}</label>
+            <label style={{fontSize: "15px"}}>
+                Member Since: {new Date(info["registerTime"]).toLocaleString().split(",")[0]}
+            </label>
             <hr style={{borderTop: "1px solid #EDF0F2"}}/>
-            <div style={{
-                width: "80%",
-                margin: "10px auto"
-            }}>
+            <div style={{width: "80%", margin: "10px auto"}}>
                 {
                     !showChangePasswordForm
                         ? (
