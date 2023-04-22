@@ -22,7 +22,7 @@ textarea, select, input, button { outline: none; }
 
 .input-field {
     font-family: "arial", serif;
-    font-size: 120%;
+    font-size: 100%;
     color: #454545;
     width: calc(100% - 22px);
     height: 40px;
@@ -244,4 +244,14 @@ div:has(> #coachSelector) {
     opacity: 0.6;
     display: inline-flex;
     align-items: center;
+}
+
+.info-panel {
+    height: auto;
+    text-align: center;
+    font-family: Verdana, sans-serif;
+    padding: 20px;
+    width: 30%;
+    font-size: 20px;
+    min-height: 650px;
 }

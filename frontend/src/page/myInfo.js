@@ -4,7 +4,26 @@ import {Avatar, Badge} from "evergreen-ui";
 import JNotification from "../component/jNotification";
 import {EventPanel} from "../component/eventPanel";
 
-export function MyInfo(props) {
+function PasswordInput(props) {
+    return (
+        <>
+            <div>
+                <label className="input-field-label">{props.name}:</label>
+            </div>
+            <input
+                className="input-field"
+                maxLength="20"
+                required
+                placeholder={props.placeholder}
+                type="password"
+                onChange={e => props.setValueFn(e.target.value)}
+                value={props.value}
+            />
+        </>
+    )
+}
+
+function InfoPanel(props) {
     const [info, setInfo] = useState({});
     const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
@@ -26,7 +45,7 @@ export function MyInfo(props) {
 
     useEffect(() => {
         fetchUserData();
-    },[])
+    }, [])
 
     function handleChangePassword() {
         if (oldPassword === "" || newPassword === "" || confirmPassword === "") {
@@ -39,38 +58,58 @@ export function MyInfo(props) {
         }
 
         const loginQuery = new FormData();
-        loginQuery.append("username", props.userInfo.username);
+        loginQuery.append("username", info.username);
         loginQuery.append("password", oldPassword);
-        Axios.post("/login", loginQuery)
-            .then(res => {
-                const data = res.data;
-                const status = data.status;
-                if (status === 200) {
-                    const query = new FormData();
-                    query.append("password", newPassword);
-                    Axios.put("/api/user/password", query)
-                        .then((res) => {
-                            const data = res.data;
-                            const status = data.status;
-                            if (status === 200) {
-                                JNotification.success("Password is changed. Please login.");
-                                props.logout();
-                            }
-                        })
-                        .catch((err) => {
-                            JNotification.danger(err.response.data.message);
-                        })
-                }
-            })
-            .catch(error => {
-                JNotification.danger(error.response.data.message);
-            })
+        Axios({
+            method: "post",
+            url: "/api/v1/auth/authenticate",
+            data: loginQuery,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => {
+            if (res.status === 200) {
+                const query = new FormData();
+                query.append("password", newPassword);
+                Axios({
+                    method: "put",
+                    url: "/api/v1/auth/password",
+                    data: query,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then((res) => {
+                    if (res.status === 200) {
+                        JNotification.success("Password is changed. Please login.");
+                        props.logout();
+                    }
+                }).catch((err) => {
+                    JNotification.danger("Failed to Change Password");
+                })
+            }
+        }).catch(error => {
+            JNotification.danger("Failed to Change Password");
+        })
     }
 
-    function PasswordChanger() {
-        return (
+    return (
+        <div className={"info-panel"}>
+            <Avatar
+                name={info.username}
+                size={100}
+                marginTop="5px"
+            />
+            <br/>
+            <label>{info.username}</label>
+            <br/>
+            <Badge color={info.role === "COACH" ? "yellow" : "green"}
+                   style={{fontSize: "16px", height: "16px"}}>{info.role}</Badge>
+            <br/>
+            <label style={{fontSize: "15px"}}>Member
+                Since: {new Date(info["registerTime"]).toLocaleString().split(",")[0]}</label>
+            <hr style={{borderTop: "1px solid #EDF0F2"}}/>
             <div style={{
-                width: "50%",
+                width: "80%",
                 margin: "10px auto"
             }}>
                 {
@@ -84,48 +123,21 @@ export function MyInfo(props) {
                         : (
                             <div>
                                 <form>
-                                    <div>
-                                        <label className="input-field-label">Old Password:</label>
-                                    </div>
-                                    <input
-                                        className="input-field"
-                                        maxLength="20"
-                                        required
-                                        placeholder="Enter Old Password..."
-                                        type="password"
-                                        onChange={e => setOldPassword(e.target.value)}
-                                    />
+                                    <PasswordInput name={"Old Password"} placeholder={"Enter Old Password..."}
+                                                   value={oldPassword} setValueFn={setOldPassword}/>
                                     <br/>
-                                    <div>
-                                        <label className="input-field-label">New Password:</label>
-                                    </div>
-                                    <input
-                                        className="input-field"
-                                        maxLength="20"
-                                        required
-                                        placeholder="Enter New Password..."
-                                        type="password"
-                                        onChange={e => setNewPassword(e.target.value)}
-                                    />
+                                    <PasswordInput name={"New Password"} placeholder={"Enter New Password..."}
+                                                   value={newPassword} setValueFn={setNewPassword}/>
                                     <br/>
-                                    <div>
-                                        <label className="input-field-label">Confirm Password:</label>
-                                    </div>
-                                    <input
-                                        className="input-field"
-                                        maxLength="20"
-                                        required
-                                        placeholder="Re-Enter Password..."
-                                        type="password"
-                                        onChange={e => setConfirmPassword(e.target.value)}
-                                    />
+                                    <PasswordInput name={"Confirm Password"} placeholder={"Re-Enter Password..."}
+                                                   value={confirmPassword} setValueFn={setConfirmPassword}/>
                                 </form>
-                                <br/>
                                 <button
                                     style={{marginBottom: 10}}
                                     onClick={() => handleChangePassword()}
                                     className="login-register-button-primary"
-                                >Submit</button>
+                                >Submit
+                                </button>
                                 <button
                                     onClick={() => {
                                         setShowChangePasswordForm(false);
@@ -134,40 +146,21 @@ export function MyInfo(props) {
                                         setConfirmPassword("");
                                     }}
                                     className="login-register-button-secondary"
-                                >Cancel</button>
+                                >Cancel
+                                </button>
                             </div>
                         )
                 }
             </div>
-        )
-    }
+        </div>
+    )
+}
 
+export function MyInfo(props) {
     return (
         <div className="table-content">
-            <div style={{
-                height: "auto",
-                textAlign: "center",
-                fontFamily: "Verdana",
-                padding: 20,
-                width: "80%",
-                margin: "auto",
-                fontSize: 20
-            }}>
-                <Avatar
-                    name={info.username}
-                    size={100}
-                    marginTop="5px"
-                />
-                <br/>
-                <label>{info.username}</label>
-                <br/>
-                <Badge color={info.role === "COACH" ? "yellow" : "green"} style={{fontSize: "16px", height: "16px"}}>{info.role}</Badge>
-                <br/>
-                <label style={{fontSize: "15px"}}>Member Since: {new Date(info["registerTime"]).toLocaleString().split(",")[0]}</label>
-                <hr style={{borderTop: "1px solid #EDF0F2"}} />
-                <EventPanel eventApi={"/api/v1/course/getTodayCourses"} userInfo={props.userInfo} />
-                {/*<PasswordChanger />*/}
-            </div>
+            <InfoPanel logout={props.logout}/>
+            <EventPanel eventApi={"/api/v1/course/getTodayCourses"} userInfo={props.userInfo}/>
         </div>
     )
 }

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -47,5 +48,14 @@ public class AuthenticationService {
                 .username(principal.getUsername())
                 .role(principal.getRole())
                 .build();
+    }
+
+    public boolean changePassword(int currentUid, String password) {
+        var existedUser = userRepository.findById(currentUid).orElseGet(null);
+        if (existedUser == null) return false;
+        existedUser.setPassword(new BCryptPasswordEncoder().encode(password));
+        userRepository.save(existedUser);
+        var check = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(existedUser.getUsername(), password)).isAuthenticated();
+        return check;
     }
 }
