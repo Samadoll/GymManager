@@ -26,34 +26,29 @@ export function EventPopup(f, event, userInfo, fn) {
     return (
         <div>
             {
-                Object.keys(fields).map((field, index) => (
-                    <div style={{minHeight: "24px"}}>
-                        {
-                            fields[field].renderType === "span"
-                                ? (
-                                    <CustomSpan key={index} >
-                                        <img src={fields[field].svg}
-                                             width={"20px"}
-                                             height={"20px"}
-                                             style={{ verticalAlign: "middle", marginLeft: "2px", marginRight: "10px"}}/>
-                                        {fields[field].value}
-                                    </CustomSpan>
-                                )
-                                : (
-                                    <CustomSpan key={index} >
-                                        <img src={fields[field].svg}
-                                             width={"20px"}
-                                             height={"20px"}
-                                             style={{ verticalAlign: "top", marginLeft: "2px", marginRight: "10px"}}
-                                        />
-                                        <textarea readOnly={true} style={{width: "340px", resize: "none", border: "1px solid #ccc"}} rows={4}>
-                                            {fields[field].value}
-                                        </textarea>
-                                    </CustomSpan>
-                                )
-                        }
-                    </div>
-                ))
+                Object.keys(fields).map((field, index) => {
+                    let isSpan = fields[field].renderType === "span";
+                    let verticalAlign = isSpan ? "middle" : "top";
+                    return (
+                        <div style={{minHeight: "24px"}}>
+                            <CustomSpan key={index} >
+                                <img src={fields[field].svg}
+                                     width={"20px"}
+                                     height={"20px"}
+                                     style={{ verticalAlign: verticalAlign, marginLeft: "2px", marginRight: "10px"}}/>
+                                {
+                                    isSpan
+                                        ? fields[field].value
+                                        : (
+                                            <textarea readOnly={true} style={{width: "340px", resize: "none", border: "1px solid #ccc"}} rows={4}>
+                                                {fields[field].value}
+                                            </textarea>
+                                        )
+                                }
+                            </CustomSpan>
+                        </div>
+                    );
+                })
             }
             {
                 action === "" || (event.status === "CANCELLED" && userInfo.role !== "COACH" && action !== "DEREGISTER") || event.start < Date.now()
