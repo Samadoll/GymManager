@@ -6,7 +6,7 @@ module.exports = {
     mode: 'production',
     output: {
         path: __dirname,
-        filename: './src/main/resources/static/built/bundle.js'
+        filename: './src/main/resources/static/built/[name].bundle.js'
     },
     module: {
         rules: [
@@ -21,5 +21,21 @@ module.exports = {
                 }]
             }
         ]
+    },
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                reactVendor: {
+                    test: /[\\/]node_modules[\\/](react|react-dom|react-router-dom)[\\/]/,
+                    name: 'vendor-react',
+                    chunks: 'all',
+                },
+                muiVendor: {
+                    test: /[\\/]node_modules[\\/](@mui)[\\/]/,
+                    name: 'vendor-mui',
+                    chunks: 'all',
+                },
+            },
+        },
     }
 };
