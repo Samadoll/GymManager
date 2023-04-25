@@ -35,7 +35,7 @@ export function EventPanel(props) {
                 setEvents(data);
             }
         } catch (err) {
-            JNotification.danger(err.response.data.message);
+            JNotification.danger(err.message);
         }
     }
 
@@ -61,7 +61,7 @@ export function EventPanel(props) {
     }, [])
 
     return (
-        <div className={"event-panel" + (events.length === 0 ? " event-panel-empty" : "")}>
+        <div className={"event-panel"}>
             <CalendarIcon size={24} color={events.length === 0 ? "disabled" : "muted"}/>
             <label className={"event-panel-title" + (events.length === 0 ? "-empty" : "")}>
                 {events.length === 0 ? "You don't have any courses today." : "Your Upcoming Courses Today"}

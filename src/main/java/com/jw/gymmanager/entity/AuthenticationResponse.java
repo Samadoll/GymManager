@@ -1,5 +1,6 @@
 package com.jw.gymmanager.entity;
 
+import com.jw.gymmanager.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

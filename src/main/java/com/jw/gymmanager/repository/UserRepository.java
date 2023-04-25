@@ -1,6 +1,6 @@
 package com.jw.gymmanager.repository;
 
-import com.jw.gymmanager.entity.Role;
+import com.jw.gymmanager.enums.Role;
 import com.jw.gymmanager.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 

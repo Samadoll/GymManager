@@ -1,6 +1,7 @@
 package com.jw.gymmanager.service;
 
 import com.jw.gymmanager.entity.*;
+import com.jw.gymmanager.enums.Role;
 import com.jw.gymmanager.repository.UserRepository;
 import com.jw.gymmanager.util.JwtUtil;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,8 @@
 package com.jw.gymmanager.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jw.gymmanager.enums.CourseStatus;
+import com.jw.gymmanager.enums.CourseType;
 import jakarta.persistence.*;
 import lombok.*;
 

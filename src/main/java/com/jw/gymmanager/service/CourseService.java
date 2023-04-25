@@ -1,6 +1,8 @@
 package com.jw.gymmanager.service;
 
 import com.jw.gymmanager.entity.*;
+import com.jw.gymmanager.enums.CourseStatus;
+import com.jw.gymmanager.enums.Role;
 import com.jw.gymmanager.repository.CourseRepository;
 import com.jw.gymmanager.repository.CourseRegistrationRepository;
 import com.jw.gymmanager.repository.UserRepository;
@@ -101,7 +103,7 @@ public class CourseService {
         if (user.isEmpty())
             return JResponse.builder().status(400).message("Not Allowed to " + action).build();
         var existedUser = user.get();
-        var course = courseRepository.findById(eventId).orElseGet(null);
+        var course = courseRepository.findById(eventId).orElse(null);
         if (course != null) {
             CourseEvent returnCourse = null;
             if (existedUser.getRole() == Role.COACH && existedUser.getId().equals(course.getOwner().getId())) {
