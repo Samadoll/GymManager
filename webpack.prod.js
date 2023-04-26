@@ -1,6 +1,18 @@
 const path = require('path');
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+// const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
+    // plugins: [
+    //     new BundleAnalyzerPlugin(),
+    //     new CompressionPlugin({
+    //         filename: "[path][name].gz",
+    //         algorithm: "gzip",
+    //         test: /vendor-mui.bundle.js/,
+    //         threshold: 10240,
+    //         minRatio: 0.8
+    //     })
+    // ],
     entry: './frontend/src/app.js',
     cache: true,
     mode: 'production',
@@ -31,8 +43,23 @@ module.exports = {
                     chunks: 'all',
                 },
                 muiVendor: {
-                    test: /[\\/]node_modules[\\/](@mui)[\\/]/,
+                    test: /[\\/]node_modules[\\/]@mui[\\/](material)[\\/]/,
                     name: 'vendor-mui',
+                    chunks: 'all',
+                },
+                muiOtherVendor: {
+                    test: /[\\/]node_modules[\\/]@mui[\\/](base|system|utils|x-date-pickers)[\\/]/,
+                    name: 'vendor-mui-other',
+                    chunks: 'all',
+                },
+                datefnsVendor: {
+                    test: /[\\/]node_modules[\\/](date-fns)[\\/]/,
+                    name: 'vendor-date-fns',
+                    chunks: 'all',
+                },
+                restVendor: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: 'vendor-rest',
                     chunks: 'all',
                 },
             },
