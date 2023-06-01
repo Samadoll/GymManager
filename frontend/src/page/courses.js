@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react"
-import Axios from "axios"
+import JAxios from "../component/jAxios";
 import Scheduler from "@aldabil/react-scheduler"
 import JNotification from "../component/jNotification"
 import {Button} from "@mui/material"
@@ -9,8 +9,8 @@ import {EventColours} from "../component/eventColours";
 
 function eventRenderer(event, role) {
     if (role === "COACH") return null;
-    let start = event.start.toLocaleTimeString(undefined, { timeStyle: "short" });
-    let end = event.end.toLocaleTimeString(undefined, { timeStyle: "short" });
+    let start = event.start.toLocaleTimeString(undefined, {timeStyle: "short"});
+    let end = event.end.toLocaleTimeString(undefined, {timeStyle: "short"});
     return (
         <div style={{padding: "2px 6px"}}>
             <h6 className={"event-element event-title"}>{event.title}</h6>
@@ -18,7 +18,12 @@ function eventRenderer(event, role) {
             <p className={"event-element event-text"}>{event.coach}</p>
             {event.isRegistered
                 ? (<div style={{textAlign: "center"}}>
-                    <Badge color={"green"} style={{fontSize: "10px", height: "12px", lineHeight: "11px", width: "100%"}}>Registered</Badge>
+                    <Badge color={"green"} style={{
+                        fontSize: "10px",
+                        height: "12px",
+                        lineHeight: "11px",
+                        width: "100%"
+                    }}>Registered</Badge>
                 </div>)
                 : null
             }
@@ -33,7 +38,7 @@ export function MyCourses(props) {
 
     async function fetchData() {
         try {
-            const res = await Axios.get("/api/v1/course/getCourses");
+            const res = await JAxios.get("/api/v1/course/getCourses");
             const status = res.data.status;
             if (status === 200) {
                 const data = res.data.data;
@@ -46,14 +51,16 @@ export function MyCourses(props) {
 
     async function fetchCoaches() {
         try {
-            const res = await Axios.get("/api/v1/user/getCoaches");
+            const res = await JAxios.get("/api/v1/user/getCoaches");
             const status = res.data.status;
             if (status === 200) {
                 const data = res.data.data;
-                let result = data.map(x => { return {
-                    id: x.id,
-                    username: x.username
-                }});
+                let result = data.map(x => {
+                    return {
+                        id: x.id,
+                        username: x.username
+                    }
+                });
                 setCoaches(result);
             }
         } catch (err) {
@@ -68,7 +75,7 @@ export function MyCourses(props) {
         if (props.userInfo.role === "TRAINEE") {
             fetchCoaches();
         }
-        cal.current.scheduler.week.cellRenderer = ({ height, start, onClick, ...props }) => {
+        cal.current.scheduler.week.cellRenderer = ({height, start, onClick, ...props}) => {
             let disabled = start <= Date.now();
             const restProps = disabled || isTrainee ? {} : props;
             return (
@@ -83,7 +90,7 @@ export function MyCourses(props) {
                 />
             );
         }
-    },[]);
+    }, []);
 
 
     function buildData(data) {
@@ -136,7 +143,7 @@ export function MyCourses(props) {
             await fetchData();
             return;
         }
-        await Axios.get("/api/v1/course/getCoachCourses/" + id)
+        await JAxios.get("/api/v1/course/getCoachCourses/" + id)
             .then(res => {
                 if (res.status === 200) {
                     let data = getCoursesFromData(res.data.data, false);
@@ -163,13 +170,13 @@ export function MyCourses(props) {
                 name: "availableSlots",
                 type: "input",
                 default: 10,
-                config: { label: "Available Slot" }
+                config: {label: "Available Slot"}
             },
             {
                 name: "description",
                 type: "input",
                 default: "Course Description...",
-                config: { label: "Details", multiline: true, rows: 4 }
+                config: {label: "Details", multiline: true, rows: 4}
             }
         ];
         cal.current.scheduler.handleState(res, "fields");
@@ -193,37 +200,33 @@ export function MyCourses(props) {
         if (action === "edit") {
             query.append("id", e.event_id);
         }
-        await Axios({
-            method: method,
-            url: url,
-            data: query,
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(res => {
-            if (res.status === 200) {
-                JNotification.success("Successfully " + action);
-                e = getCoursesFromData([res.data.data], false)[0];
-            }
-        }).catch(error => {
-            JNotification.danger("Failed to " + action);
-            throw new Error("Failed to " + action);
-        });
+        await JAxios.method(method, url, query)
+            .then(res => {
+                if (res.status === 200) {
+                    JNotification.success("Successfully " + action);
+                    e = getCoursesFromData([res.data.data], false)[0];
+                }
+            })
+            .catch(error => {
+                JNotification.danger("Failed to " + action);
+                throw new Error("Failed to " + action);
+            });
         return e;
     }
 
     async function handleDelete(id) {
-        await Axios.delete("/api/v1/course/deleteCourse/" + id
-        ).then(res => {
-            if (res.status === 200) {
-                JNotification.success("Successfully Deleted");
-            } else {
+        await JAxios.delete("/api/v1/course/deleteCourse/" + id)
+            .then(res => {
+                if (res.status === 200) {
+                    JNotification.success("Successfully Deleted");
+                } else {
+                    throw new Error("Failed to Delete");
+                }
+            })
+            .catch(error => {
+                JNotification.danger("Failed to Delete");
                 throw new Error("Failed to Delete");
-            }
-        }).catch(error => {
-            JNotification.danger("Failed to Delete");
-            throw new Error("Failed to Delete");
-        })
+            })
         return id;
     }
 
@@ -231,35 +234,30 @@ export function MyCourses(props) {
         let query = new FormData();
         query.append("action", action.toLowerCase());
         query.append("id", event.event_id);
-        await Axios({
-            method: "post",
-            url: "/api/v1/course/actionCourse",
-            data: query,
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(res => {
-            if (res.status === 200) {
-                JNotification.success("Successfully " + action);
-                let event = getCoursesFromData([res.data.data], action === "REGISTER")[0];
-                cal.current.scheduler.confirmEvent(event, "edit");
-                if (props.userInfo.role === "TRAINEE") {
-                    if (action === "DEREGISTER") {
-                        courses.current = courses.current.filter(t => t.event_id !== event.event_id);
-                        let currentCoachId = document.querySelector("#coachSelector").value;
-                        if (event.coachId.toString() !== currentCoachId) {
-                            let updatedEvents = cal.current.scheduler.events.filter(t => t.event_id !== event.event_id);
-                            cal.current.scheduler.handleState(updatedEvents, "events");
+        await JAxios.post("/api/v1/course/actionCourse", query)
+            .then(res => {
+                if (res.status === 200) {
+                    JNotification.success("Successfully " + action);
+                    let event = getCoursesFromData([res.data.data], action === "REGISTER")[0];
+                    cal.current.scheduler.confirmEvent(event, "edit");
+                    if (props.userInfo.role === "TRAINEE") {
+                        if (action === "DEREGISTER") {
+                            courses.current = courses.current.filter(t => t.event_id !== event.event_id);
+                            let currentCoachId = document.querySelector("#coachSelector").value;
+                            if (event.coachId.toString() !== currentCoachId) {
+                                let updatedEvents = cal.current.scheduler.events.filter(t => t.event_id !== event.event_id);
+                                cal.current.scheduler.handleState(updatedEvents, "events");
+                            }
+                        } else {
+                            courses.current.push(event);
                         }
-                    } else {
-                        courses.current.push(event);
                     }
                 }
-            }
-        }).catch(error => {
-            JNotification.danger("Failed to " + action)
-            throw new Error("Failed to " + action)
-        });
+            })
+            .catch(error => {
+                JNotification.danger("Failed to " + action)
+                throw new Error("Failed to " + action)
+            });
         closeView();
     }
 

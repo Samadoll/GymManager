@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import Axios from "axios"
 import JNotification from "../component/jNotification";
+import JAxios from "../component/jAxios";
 
 export function Login(props) {
     const [username, setUsername] = useState("");
@@ -16,10 +16,7 @@ export function Login(props) {
             JNotification.danger("Please Enter Username and Password");
             return;
         }
-        Axios.post("/api/v1/auth/authenticate", query, {
-            headers: {
-                'Content-Type': 'application/json',
-            }})
+        JAxios.post("/api/v1/auth/authenticate", query)
             .then(res => {
                 const data = res.data;
                 if (res.status === 200) {

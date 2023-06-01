@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import Axios from "axios"
 import JNotification from "../component/jNotification";
+import JAxios from "../component/jAxios";
 
 export function Register() {
     const [username, setUsername] = useState("");
@@ -33,10 +33,7 @@ export function Register() {
         query.append("username", username);
         query.append("password", password);
         query.append("role", role);
-        Axios.post("/api/v1/auth/register", query, {
-            headers: {
-                'Content-Type': 'application/json',
-            }})
+        JAxios.post("/api/v1/auth/register", query)
             .then(res => {
                 if (res.status === 200) {
                     JNotification.success("Successfully Registered")

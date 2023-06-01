@@ -1,12 +1,14 @@
 package com.jw.gymmanager.service;
 
 import com.jw.gymmanager.entity.*;
+import com.jw.gymmanager.enums.Role;
 import com.jw.gymmanager.repository.UserRepository;
 import com.jw.gymmanager.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -47,5 +49,13 @@ public class AuthenticationService {
                 .username(principal.getUsername())
                 .role(principal.getRole())
                 .build();
+    }
+
+    public boolean changePassword(int currentUid, String password) {
+        var existedUser = userRepository.findById(currentUid).orElseGet(null);
+        if (existedUser == null) return false;
+        existedUser.setPassword(new BCryptPasswordEncoder().encode(password));
+        userRepository.save(existedUser);
+        return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(existedUser.getUsername(), password)).isAuthenticated();
     }
 }

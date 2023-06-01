@@ -3,12 +3,12 @@ import {HashRouter, Routes, Route, Navigate} from "react-router-dom";
 import { Login } from "./page/login";
 import { Register } from "./page/register";
 import { Header } from "./component/header";
-import Axios from "axios";
 import { Spinner } from "evergreen-ui";
 import { Home } from "./page/home"
 import { MyInfo } from "./page/myInfo";
 import { MyCourses } from "./page/courses";
-// import { About } from "./page/about";
+import JAxios from "./component/jAxios";
+import { About } from "./page/about";
 
 export function Routex() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -25,7 +25,7 @@ export function Routex() {
     }
 
     async function logout(flag=true) {
-        if (flag) await Axios.post("/api/v1/auth/logout")
+        if (flag) await JAxios.post("/api/v1/auth/logout", null);
         setUserInfo({
             username: "",
             uid: 0,
@@ -36,9 +36,8 @@ export function Routex() {
 
     async function initialFetch() {
         try {
-            const res = await Axios.get("/api/v1/auth/checkAuth");
-            const status = res.status;
-            if (status === 200) {
+            const res = await JAxios.get("/api/v1/auth/checkAuth");
+            if (res.status === 200) {
                 setUserInfo({
                     username: res.data.username,
                     uid: res.data.uid,
@@ -89,7 +88,7 @@ export function Routex() {
                                 <Route exact path="/registerPage" element={
                                     isLoggedIn ? (<Navigate to="/" />) : (<Register />)
                                 }/>
-                                {/*<Route exact path="/about" element={<About />} />*/}
+                                <Route exact path="/about" element={<About />} />
                             </Routes>
                         )
                 }

@@ -22,7 +22,7 @@ textarea, select, input, button { outline: none; }
 
 .input-field {
     font-family: "arial", serif;
-    font-size: 120%;
+    font-size: 100%;
     color: #454545;
     width: calc(100% - 22px);
     height: 40px;
@@ -41,6 +41,7 @@ textarea, select, input, button { outline: none; }
     margin: 1px;
     border: 1px solid transparent;
     border-radius: 4px;
+    cursor: pointer;
 }
 
 .login-register-button-secondary {
@@ -52,6 +53,7 @@ textarea, select, input, button { outline: none; }
     margin: 1px;
     border: 1px solid #cccccc;
     border-radius: 4px;
+    cursor: pointer;
 }
 
 .login-register-selection {
@@ -69,6 +71,7 @@ textarea, select, input, button { outline: none; }
     height: 40px;
     border: 1px solid #cccccc;
     border-radius: 4px;
+    cursor: pointer;
 }
 
 .login-register-selection-button {
@@ -204,18 +207,35 @@ div:has(> #coachSelector) {
 }
 
 .event-panel {
+    display: inline-block;
     height: auto;
     text-align: center;
     font-family: Roboto, Helvetica, Arial, sans-serif;
-    width: 80%;
+    width: 38%;
     margin: auto;
+    padding: 20px;
+    vertical-align: top;
+}
+
+.event-panel-title {
+    color: #8F95B2;
+    font-size: 20px;
+    vertical-align: top;
+    margin-left: 10px;
+}
+
+.event-panel-title-empty {
+    color: #D8DAE5;
+    font-size: 20px;
+    vertical-align: top;
+    margin-left: 10px;
 }
 
 .event-panel-element {
     padding: 2px 6px;
     border-radius: 5px;
     border: 1px solid #CCC;
-    width: 40%;
+    width: 80%;
     background-color: #F4FCF4;
     margin: 2px auto;
 }
@@ -244,4 +264,102 @@ div:has(> #coachSelector) {
     opacity: 0.6;
     display: inline-flex;
     align-items: center;
+}
+
+.info-panel {
+    min-height: 70vh;
+    display: inline-block;
+    height: auto;
+    text-align: center;
+    font-family: Verdana, sans-serif;
+    padding: 20px;
+    width: 28%;
+    font-size: 20px;
+    vertical-align: top;
+}
+
+.info-panel-field-label {
+    font-size: 80% !important;
+}
+
+.info-panel-field {
+    font-size: 80% !important;
+    height: 30px !important;
+}
+
+.info-panel-button {
+    font-size: 15px;
+    height: 30px;
+}
+
+.info-panel-button:hover {
+    filter: brightness(95%);
+}
+
+.info-panel-divider {
+    position: absolute;
+    top: 20px;
+    bottom: 20px;
+    display: inline-block;
+    width: 0;
+    border: 1px solid #EDF0F2;;
+}
+
+.user-list-panel {
+    display: inline-block;
+    height: auto;
+    text-align: center;
+    font-family: Verdana, sans-serif;
+    padding: 20px;
+    width: 23.9%;
+    vertical-align: top;
+}
+
+.quota-element-button-group > button {
+    margin: 0 3px;
+    height: 20px;
+    border: 1px solid;
+    background-color: white;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.bttn-success {
+    border-color: #04AA6D;
+    color: green;
+}
+
+.bttn-success:hover {
+    background-color: #04AA6D;
+    color: white;
+}
+
+.bttn-info {
+    border-color: #2196F3;
+    color: dodgerblue;
+}
+
+.bttn-info:hover {
+    background: #2196F3;
+    color: white;
+}
+
+.bttn-warning {
+    border-color: #ff9800;
+    color: orange;
+}
+
+.bttn-warning:hover {
+    background: #ff9800;
+    color: white;
+}
+
+.bttn-danger {
+    border-color: #f44336;
+    color: red;
+}
+
+.bttn-danger:hover {
+    background: #f44336;
+    color: white;
 }

@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from "react";
-import Axios from "axios";
+import JAxios from "./jAxios";
 import JNotification from "./jNotification";
 import {Badge, CalendarIcon} from "evergreen-ui";
 
 function EventCard(props) {
-    let start = new Date(props.event.startTime).toLocaleTimeString(undefined, { timeStyle: "short" });
-    let end = new Date(props.event.endTime).toLocaleTimeString(undefined, { timeStyle: "short" });
+    let start = new Date(props.event.startTime).toLocaleTimeString(undefined, {timeStyle: "short"});
+    let end = new Date(props.event.endTime).toLocaleTimeString(undefined, {timeStyle: "short"});
     let badgeColour = props.event.status === "ACTIVE" ? "green" : "red";
     let readonly = new Date(props.event.startTime).getTime() < new Date().getTime();
     let action = "DEREGISTER";
@@ -18,7 +18,7 @@ function EventCard(props) {
             <p className={"event-element event-text"}>{start} - {end}</p>
             {props.userInfo.role === "COACH" ? null : (<p className={"event-element event-text"}>{props.event.owner.username}</p>)}
             <Badge color={badgeColour} style={{verticalAlign: "top"}}>{props.event.status}</Badge>
-            {readonly ? null : (<button className="login-register-button-primary" onClick={() => { props.fn.apply(null, [props.event, action]); }}>{action}</button>)}
+            {readonly ? null : (<button className="login-register-button-primary" onClick={() => {props.fn.apply(null, [props.event, action]);}}>{action}</button>)}
         </div>
     )
 }
@@ -28,14 +28,14 @@ export function EventPanel(props) {
 
     async function fetchEvent() {
         try {
-            const res = await Axios.get(props.eventApi);
+            const res = await JAxios.get(props.eventApi);
             const status = res.data.status;
             if (status === 200) {
                 const data = res.data.data;
                 setEvents(data);
             }
         } catch (err) {
-            JNotification.danger(err.response.data.message);
+            JNotification.danger(err.message);
         }
     }
 
@@ -43,39 +43,34 @@ export function EventPanel(props) {
         let query = new FormData();
         query.append("action", action.toLowerCase());
         query.append("id", event.id);
-        await Axios({
-            method: "post",
-            url: "/api/v1/course/actionCourse",
-            data: query,
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(res => {
-            if (res.status === 200) {
-                JNotification.success("Successfully " + action);
-                fetchEvent();
-            }
-        }).catch(error => {
-            JNotification.danger("Failed to " + action)
-            throw new Error("Failed to " + action)
-        });
+        await JAxios.post("/api/v1/course/actionCourse", query)
+            .then(res => {
+                if (res.status === 200) {
+                    JNotification.success("Successfully " + action);
+                    fetchEvent();
+                }
+            })
+            .catch(error => {
+                JNotification.danger("Failed to " + action)
+                throw new Error("Failed to " + action)
+            });
     }
 
     useEffect(() => {
         fetchEvent();
-    },[])
+    }, [])
 
     return (
-      <div className={"event-panel"}>
-          <CalendarIcon size={24} color={events.length === 0 ? "disabled" : "muted"} />
-          <label style={{color: events.length === 0 ? "#D8DAE5" : "#8F95B2", fontSize: "20px", verticalAlign: "top", marginLeft: "10px"}}>
-              {events.length === 0 ? "You don't have any courses today." : "Your Upcoming Courses Today"}
-          </label>
-          {
-              events.length !== 0
-                  ? events.map((e) => <EventCard event={e} userInfo={props.userInfo} fn={handlePopupButton}/>)
-                  : null
-          }
-      </div>
+        <div className={"event-panel"}>
+            <CalendarIcon size={24} color={events.length === 0 ? "disabled" : "muted"}/>
+            <label className={"event-panel-title" + (events.length === 0 ? "-empty" : "")}>
+                {events.length === 0 ? "You don't have any courses today." : "Your Upcoming Courses Today"}
+            </label>
+            {
+                events.length !== 0
+                    ? events.map((e) => <EventCard event={e} userInfo={props.userInfo} fn={handlePopupButton}/>)
+                    : null
+            }
+        </div>
     );
 }
